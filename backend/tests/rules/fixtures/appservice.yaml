@@ -1,0 +1,51 @@
+app-https-only:
+  pass: {properties: {httpsOnly: true}}
+  fail: {properties: {httpsOnly: false}}
+app-min-tls:
+  pass: {properties: {siteConfig: {minTlsVersion: "1.2"}}}
+  fail: {properties: {siteConfig: {minTlsVersion: "1.0"}}}
+app-ftp-enabled:
+  pass: {properties: {siteConfig: {ftpsState: FtpsOnly}}}
+  fail: {properties: {siteConfig: {ftpsState: AllAllowed}}}
+app-no-managed-identity:
+  pass: {identity: {type: SystemAssigned, principalId: p1}}
+  fail: {identity: null}
+app-remote-debugging:
+  pass: {properties: {siteConfig: {remoteDebuggingEnabled: false}}}
+  fail: {properties: {siteConfig: {remoteDebuggingEnabled: true}}}
+app-http2-disabled:
+  pass: {properties: {siteConfig: {http20Enabled: true}}}
+  fail: {properties: {siteConfig: {http20Enabled: false}}}
+app-always-on-off:
+  pass: {tags: {env: prod}, kind: "app,linux", properties: {siteConfig: {alwaysOn: true}}}
+  fail: {tags: {env: prod}, kind: "app,linux", properties: {siteConfig: {alwaysOn: false}}}
+app-old-runtime:
+  pass: [{properties: {siteConfig: {linuxFxVersion: "PYTHON|3.11"}}}, {properties: {siteConfig: {linuxFxVersion: "DOTNETCORE|8.0"}}}, {properties: {siteConfig: {linuxFxVersion: "NODE|20-lts"}}}]
+  fail: [{properties: {siteConfig: {linuxFxVersion: "PYTHON|3.8"}}}, {properties: {siteConfig: {linuxFxVersion: "NODE|16-lts"}}}, {properties: {siteConfig: {linuxFxVersion: "DOTNETCORE|6.0"}}}]
+app-no-vnet-integration:
+  pass: {tags: {env: prod}, properties: {virtualNetworkSubnetId: /subnets/int}}
+  fail: {tags: {env: prod}, properties: {virtualNetworkSubnetId: null}}
+app-cors-wildcard:
+  pass: {properties: {siteConfig: {cors: {allowedOrigins: ["https://portal.contoso.example"]}}}}
+  fail: {properties: {siteConfig: {cors: {allowedOrigins: ["*"]}}}}
+plan-single-instance-production:
+  pass: {tags: {env: prod}, sku: {name: P1v3, tier: PremiumV3, capacity: 3}, properties: {numberOfSites: 2}}
+  fail: {tags: {env: prod}, sku: {name: S1, tier: Standard, capacity: 1}, properties: {numberOfSites: 1}}
+plan-no-zone-redundancy:
+  pass: {tags: {env: prod}, sku: {tier: PremiumV3}, properties: {numberOfSites: 2, zoneRedundant: true}}
+  fail: {tags: {env: prod}, sku: {tier: PremiumV3}, properties: {numberOfSites: 2, zoneRedundant: false}}
+plan-no-sla-production:
+  pass: {tags: {env: prod}, sku: {tier: PremiumV3}, properties: {numberOfSites: 1}}
+  fail: {tags: {env: prod}, sku: {tier: Basic, name: B1}, properties: {numberOfSites: 1}}
+ca-insecure-ingress:
+  pass: {properties: {configuration: {ingress: {external: true, allowInsecure: false}}}}
+  fail: {properties: {configuration: {ingress: {external: true, allowInsecure: true}}}}
+ca-external-ingress-open:
+  pass: {properties: {configuration: {ingress: {external: true, ipSecurityRestrictions: [{name: office, ipAddressRange: 203.0.113.0/24, action: Allow}]}}}}
+  fail: {properties: {configuration: {ingress: {external: true}}}}
+ca-scale-to-zero-production:
+  pass: {tags: {env: prod}, properties: {template: {scale: {minReplicas: 2}}}}
+  fail: {tags: {env: prod}, properties: {template: {scale: {minReplicas: 0}}}}
+cae-not-zone-redundant:
+  pass: {tags: {env: prod}, properties: {zoneRedundant: true}}
+  fail: {tags: {env: prod}, properties: {zoneRedundant: false}}

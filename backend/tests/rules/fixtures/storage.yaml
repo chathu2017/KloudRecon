@@ -1,0 +1,48 @@
+st-https-only:
+  pass: {properties: {supportsHttpsTrafficOnly: true}}
+  fail: {properties: {supportsHttpsTrafficOnly: false}}
+st-min-tls:
+  pass: {properties: {minimumTlsVersion: TLS1_2}}
+  fail: [{properties: {minimumTlsVersion: TLS1_0}}, {properties: {}}]
+st-public-blob-access:
+  pass: {properties: {allowBlobPublicAccess: false}}
+  fail: {properties: {allowBlobPublicAccess: true}}
+st-network-default-allow:
+  pass: [{properties: {networkAcls: {defaultAction: Deny}}}, {properties: {publicNetworkAccess: Disabled, networkAcls: {defaultAction: Allow}}}]
+  fail: {properties: {publicNetworkAccess: Enabled, networkAcls: {defaultAction: Allow}}}
+st-shared-key-enabled:
+  pass: {properties: {allowSharedKeyAccess: false}}
+  fail: [{properties: {allowSharedKeyAccess: true}}, {properties: {}}]
+st-trusted-services-blocked:
+  pass: {properties: {networkAcls: {defaultAction: Deny, bypass: "Logging, AzureServices"}}}
+  fail: {properties: {networkAcls: {defaultAction: Deny, bypass: None}}}
+st-no-private-endpoint:
+  pass: {tags: {env: prod}, properties: {privateEndpointConnections: [{properties: {privateEndpoint: {id: /pe}}}]}}
+  fail: {tags: {env: prod}, properties: {}}
+st-cmk-confidential:
+  pass: {tags: {data-classification: confidential}, properties: {encryption: {keySource: Microsoft.Keyvault}}}
+  fail: {tags: {data-classification: confidential}, properties: {encryption: {keySource: Microsoft.Storage}}}
+st-infrastructure-encryption:
+  pass: {tags: {data-classification: restricted}, properties: {encryption: {requireInfrastructureEncryption: true}}}
+  fail: {tags: {data-classification: restricted}, properties: {encryption: {keySource: Microsoft.Storage}}}
+st-lrs-production:
+  pass: {tags: {env: production}, sku: {name: Standard_ZRS}}
+  fail: {tags: {env: production}, sku: {name: Standard_LRS}}
+st-cross-tenant-replication:
+  pass: {properties: {allowCrossTenantReplication: false}}
+  fail: {properties: {}}
+st-default-oauth:
+  pass: {properties: {defaultToOAuthAuthentication: true}}
+  fail: {properties: {}}
+st-no-sas-expiration-policy:
+  pass: {properties: {sasPolicy: {sasExpirationPeriod: "1.00:00:00", expirationAction: Log}}}
+  fail: {properties: {allowSharedKeyAccess: true}}
+st-no-key-rotation-policy:
+  pass: {properties: {keyPolicy: {keyExpirationPeriodInDays: 90}}}
+  fail: {properties: {allowSharedKeyAccess: true}}
+st-general-purpose-v1:
+  pass: {kind: StorageV2}
+  fail: {kind: Storage}
+st-ip-rule-too-wide:
+  pass: {properties: {networkAcls: {ipRules: [{value: 203.0.113.0/24, action: Allow}]}}}
+  fail: {properties: {networkAcls: {ipRules: [{value: 0.0.0.0/0, action: Allow}]}}}

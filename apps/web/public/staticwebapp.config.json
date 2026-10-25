@@ -1,0 +1,44 @@
+{
+  "navigationFallback": {
+    "rewrite": "/app.html",
+    "exclude": [
+      "/assets/*",
+      "/azure-icons/*",
+      "/*.{png,jpg,svg,ico,webp,woff2,txt,json}"
+    ]
+  },
+  "routes": [
+    {
+      "route": "/",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/pricing",
+      "rewrite": "/pricing/index.html"
+    },
+    {
+      "route": "/security",
+      "rewrite": "/security/index.html"
+    },
+    {
+      "route": "/*.html",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    }
+  ],
+  "globalHeaders": {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://api.azurerec.kloudschool.com https://*.ciamlogin.com https://login.microsoftonline.com https://*.applicationinsights.azure.com https://*.in.applicationinsights.azure.com https://js.monitor.azure.com; frame-src https://*.ciamlogin.com; frame-ancestors 'none'"
+  }
+}

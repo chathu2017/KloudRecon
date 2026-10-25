@@ -1,0 +1,355 @@
+/*
+ * KloudRecon theme, v5 "Altitude" (docs/ui/DESIGN_SYSTEM.md, decision 0049). The only place
+ * colors, radii, shadows and motion timings are defined. Components use them through Tailwind
+ * utilities (bg-surface, text-muted, text-critical-strong ...); never hard-code colors.
+ *
+ * Palette: cool periwinkle-gray page, white cards, midnight indigo ink (text, the sidebar, dark
+ * bands), one cobalt blue accent (buttons, links, icons, chart lines) with a cyan partner in
+ * gradients, and a warm amber signal used sparingly (attack route, steps). Severity hues sit on
+ * the cool neutrals and stay distinct from the brand (low is teal, not blue).
+ * Depth: every shadow is tinted with the ink; raised things have a lit top edge and a solid lower
+ * edge, wells are pressed in.
+ * Contrast pairs are verified in src/styles/tokens.test.ts (WCAG 2.1 AA).
+ */
+:root {
+  color-scheme: light;
+
+  /* neutrals: periwinkle-gray page, white cards, midnight indigo ink */
+  --bg: #f2f4fb;
+  --surface: #ffffff;
+  --surface-2: #f0f2fa;
+  --surface-3: #e2e6f3;
+  --border: #dde2f0;
+  --border-strong: #c2c9df;
+  --text: #141a3a;
+  --text-muted: #4a5273;
+  --text-subtle: #5c6485;
+
+  /* brand: cobalt blue (white text on the fill >= 4.5:1) */
+  --brand: #3d4fe0;
+  --brand-hover: #2f3fc4;
+  --brand-soft: #e8ebfd;
+  --brand-tint: #d3d9fb;
+  --brand-fg: #ffffff;
+  --brand-strong: #3344cc;
+  /* midnight indigo: dark bands, the CTA box, dark buttons */
+  --ink: #141a3a;
+  --ink-hover: #1f2752;
+  --ink-fg: #ffffff;
+  /* supporting accent: warm amber (attack route, steps in the app) */
+  --accent: #c7741a;
+  --accent-soft: #fdf1e1;
+  --accent-strong: #8a4a00;
+
+  /* semantic: fill (icons, bars, dots) / soft (badge background) / strong (text) */
+  --critical: #d5364e;
+  --critical-soft: #fdeaed;
+  --critical-strong: #b3243d;
+  --high: #db6b1f;
+  --high-soft: #fdefe4;
+  --high-strong: #a0480b;
+  --medium: #a87c00;
+  --medium-soft: #fbf3dc;
+  --medium-strong: #765700;
+  --low: #1489a6;
+  --low-soft: #e3f3f7;
+  --low-strong: #0f6a82;
+  --info: #6a7396;
+  --info-soft: #eef0f7;
+  --info-strong: #4a5273;
+  --success: #1f9264;
+  --success-soft: #e3f4ec;
+  --success-strong: #14694a;
+  /* text on solid fills */
+  --on-critical: #ffffff;
+
+  /* charts: cobalt first, then distinct hues (>= 3:1 on the surface), never severity-looking */
+  --chart-1: #4a5ce6;
+  --chart-2: #1492b8;
+  --chart-3: #c7791a;
+  --chart-4: #8a5cd6;
+  --chart-5: #3e9a5b;
+  --chart-6: #c4507e;
+  --chart-7: #3791d6;
+  --chart-8: #717a9c;
+  /* the soft fill under a line */
+  --chart-fill: rgb(74 92 230 / 0.18);
+  --chart-fill-end: rgb(74 92 230 / 0);
+  /* sequential ramp (cobalt) for heatmaps and the diagram cost overlay */
+  --seq-1: #e8ebfd;
+  --seq-2: #c9d0fa;
+  --seq-3: #a2adf5;
+  --seq-4: #7684ee;
+  --seq-5: #4a5ce6;
+  --seq-6: #2c3bb0;
+  --band: rgb(74 92 230 / 0.1);
+
+  /* midnight bands on marketing pages (how it works, CTA box, featured plan): dark in both themes */
+  --map-bg: #111738;
+  --map-surface: #1a2150;
+  --map-text: #f3f5ff;
+  --map-muted: #aeb6dc;
+  --map-border: rgb(243 245 255 / 0.14);
+  --map-brand: #8fa2ff;
+  --map-brand-fg: #0b1030;
+  /* the large diagonal shapes in the hero and on the featured plan */
+  --shape: rgb(61 79 224 / 0.06);
+  --shape-strong: rgb(61 79 224 / 0.1);
+  --shape-on-brand: rgb(255 255 255 / 0.08);
+
+  /* architecture diagrams (Microsoft reference-architecture containers) */
+  --dg-canvas: #f7f8fd;
+  --dg-grid: #e6e9f5;
+  --dg-node: #ffffff;
+  --dg-node-border: #d3d9ec;
+  --dg-region-border: #858db0;
+  --dg-region-bg: rgb(240 242 250 / 0.4);
+  --dg-sub-border: #c9920f;
+  --dg-sub-bg: rgb(251 243 220 / 0.35);
+  --dg-sub-text: #6a4800;
+  --dg-mg-border: #8a5cd6;
+  --dg-vnet-border: #3e9a5b;
+  --dg-vnet-bg: rgb(229 245 235 / 0.55);
+  --dg-vnet-text: #23683a;
+  --dg-subnet-border: #86c29a;
+  --dg-subnet-bg: rgb(255 255 255 / 0.85);
+  --dg-rg-border: #b9c1dc;
+  --dg-rg-bg: rgb(246 247 253 / 0.9);
+  --dg-app-border: #7684ee;
+  --dg-app-bg: rgb(232 235 253 / 0.5);
+  --dg-tier-border: #b9c1dc;
+  --dg-machine-border: #9aa5cf;
+  --dg-machine-bg: rgb(232 235 253 / 0.45);
+  --dg-nsg: #c4507e;
+  --dg-tier-bg: rgb(246 247 253 / 0.7);
+  --dg-edge: #767e9f;
+  --dg-edge-strong: #4a5273;
+  --dg-peering: #3e9a5b;
+  --dg-private: #3d4fe0;
+  --dg-route: #c7741a;
+  --dg-rbac: #8a5cd6;
+  --dg-exposure: #d5364e;
+  --dg-connection: #1492b8;
+  --dg-dim: 0.18;
+
+  /* focus, overlays, depth: ink-tinted shadows, a close contact shadow under a wide ambient one */
+  --ring: rgb(61 79 224 / 0.4);
+  --overlay: rgb(14 18 46 / 0.48);
+  --highlight: 0 0 #0000;
+  --shadow-sm: 0 1px 2px rgb(20 26 58 / 0.07);
+  --shadow-card: 0 1px 2px rgb(20 26 58 / 0.05), 0 12px 32px -18px rgb(20 26 58 / 0.18);
+  --shadow-md: 0 2px 6px rgb(20 26 58 / 0.06), 0 16px 34px -14px rgb(20 26 58 / 0.24);
+  --shadow-lg: 0 4px 12px rgb(20 26 58 / 0.06), 0 32px 64px -28px rgb(20 26 58 / 0.34);
+  --shadow-float: 0 8px 20px -12px rgb(20 26 58 / 0.16), 0 44px 88px -36px rgb(30 42 140 / 0.42);
+
+  /* depth (decisions 0048, 0049): the app sits on a desk with a faint survey grid; cards and
+     panels are slabs with a lit top edge and a solid lower edge, controls are raised keys, inputs
+     and tab tracks are wells */
+  --desk: #eceff8;
+  --desk-grid: rgb(20 26 58 / 0.055);
+  --edge: #cdd4e8;
+  --key-edge: #2632a6;
+  --raise:
+    inset 0 1px 0 rgb(255 255 255 / 0.95), 0 1px 0 var(--edge), 0 3px 0 -1px var(--edge),
+    0 2px 5px rgb(20 26 58 / 0.05), 0 20px 36px -24px rgb(20 26 58 / 0.34);
+  --raise-sm:
+    inset 0 1px 0 rgb(255 255 255 / 0.95), 0 1.5px 0 var(--edge), 0 6px 12px -7px rgb(20 26 58 / 0.26);
+  --raise-hover:
+    inset 0 1px 0 rgb(255 255 255 / 0.95), 0 1px 0 var(--brand-tint), 0 4px 0 -1px var(--brand-tint),
+    0 3px 8px rgb(20 26 58 / 0.06), 0 28px 48px -24px rgb(61 79 224 / 0.46);
+  --well: inset 0 1px 2px rgb(20 26 58 / 0.12), inset 0 0 0 1px rgb(20 26 58 / 0.02);
+  --card-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.9) 0%, rgb(255 255 255 / 0) 70%);
+  --grad-panel: linear-gradient(180deg, #ffffff 0%, #f6f7fd 100%);
+  --key-shine: inset 0 1px 0 rgb(255 255 255 / 0.32), inset 0 -1px 0 rgb(10 14 60 / 0.18);
+  /* the lit key in the sidebar: the same cobalt key with white text in both themes */
+  --key-bg: linear-gradient(135deg, #3d4fe0 0%, #0a78b8 100%);
+  --key-fg: #ffffff;
+  --key-lower: #1c2687;
+
+  /* glass and glow (decision 0045): cobalt runs into cyan in gradients, aurora washes behind
+     sections, translucent glass surfaces and a cobalt glow on hover */
+  --brand-2: #0a78b8;
+  --sky: #22a8e8;
+  --grad-brand: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  --grad-text: linear-gradient(100deg, var(--text) 0%, var(--brand-strong) 55%, var(--brand-2) 100%);
+  --grad-number: linear-gradient(120deg, var(--brand-strong) 0%, var(--brand-2) 100%);
+  --grad-tile: linear-gradient(145deg, #ffffff 0%, var(--surface-2) 100%);
+  --aurora-1: rgb(61 79 224 / 0.16);
+  --aurora-2: rgb(34 168 232 / 0.18);
+  --aurora-3: rgb(138 92 214 / 0.1);
+  --glass-bg: rgb(255 255 255 / 0.74);
+  --glass-border: rgb(255 255 255 / 0.9);
+  --glass-edge: inset 0 1px 0 rgb(255 255 255 / 0.95);
+  --glass-on-dark: rgb(255 255 255 / 0.06);
+  --glass-on-dark-border: rgb(255 255 255 / 0.14);
+  --spot: rgb(61 79 224 / 0.08);
+  --glow-border: rgb(61 79 224 / 0.42);
+  --glow-sm: 0 8px 22px -9px rgb(61 79 224 / 0.6);
+  --glow: 0 0 0 1px rgb(61 79 224 / 0.16), 0 20px 46px -18px rgb(61 79 224 / 0.48);
+  --glow-dot: 0 0 0 4px rgb(213 54 78 / 0.16);
+  /* light used on the midnight bands and the sign-in radar */
+  --beam: rgb(143 162 255 / 0.34);
+  --beam-strong: rgb(143 162 255 / 0.7);
+
+  /* shape */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur: 200ms;
+  --dur-slow: 250ms;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* midnight indigo surfaces, never flat black */
+  --bg: #0b0f24;
+  --surface: #131834;
+  --surface-2: #1a2042;
+  --surface-3: #232a52;
+  --border: #262e57;
+  --border-strong: #37406e;
+  --text: #e9ecfa;
+  --text-muted: #a9b1d4;
+  --text-subtle: #949cc2;
+
+  /* periwinkle: the cobalt lifted for dark surfaces, with dark text (>= 4.5:1) */
+  --brand: #7d8fff;
+  --brand-hover: #9aa8ff;
+  --brand-soft: #1c2350;
+  --brand-tint: #27307a;
+  --brand-fg: #0a0e2a;
+  --brand-strong: #a3b0ff;
+  --ink: #e9ecfa;
+  --ink-hover: #ffffff;
+  --ink-fg: #0b0f24;
+  --accent: #eaa850;
+  --accent-soft: #33260f;
+  --accent-strong: #f4c67c;
+
+  --critical: #f0667a;
+  --critical-soft: #3a1826;
+  --critical-strong: #ff9dab;
+  --high: #f08a4f;
+  --high-soft: #3a2216;
+  --high-strong: #ffb383;
+  --medium: #d9ac3d;
+  --medium-soft: #332a12;
+  --medium-strong: #f0ca6a;
+  --low: #45b6d1;
+  --low-soft: #10323d;
+  --low-strong: #86d6ea;
+  --info: #949cc2;
+  --info-soft: #1e2548;
+  --info-strong: #c3c9e6;
+  --success: #45bd88;
+  --success-soft: #10322a;
+  --success-strong: #84dcb0;
+  --on-critical: #0b0f24;
+
+  --chart-1: #8496ff;
+  --chart-2: #45b6d1;
+  --chart-3: #eaa850;
+  --chart-4: #b294f0;
+  --chart-5: #6cc680;
+  --chart-6: #e87fab;
+  --chart-7: #63b4f0;
+  --chart-8: #949cc2;
+  --chart-fill: rgb(132 150 255 / 0.24);
+  --chart-fill-end: rgb(132 150 255 / 0);
+  --seq-1: #1c2350;
+  --seq-2: #27307a;
+  --seq-3: #3a48a8;
+  --seq-4: #5565d6;
+  --seq-5: #7d8fff;
+  --seq-6: #bcc6ff;
+  --band: rgb(132 150 255 / 0.14);
+
+  --map-bg: #151b40;
+  --map-surface: #1d2556;
+  --shape: rgb(132 150 255 / 0.06);
+  --shape-strong: rgb(132 150 255 / 0.1);
+
+  --dg-canvas: #0d1129;
+  --dg-grid: #1a2042;
+  --dg-node: #131834;
+  --dg-node-border: #37406e;
+  --dg-region-border: #737ca6;
+  --dg-region-bg: rgb(26 32 66 / 0.35);
+  --dg-sub-border: #c9982f;
+  --dg-sub-bg: rgb(51 42 18 / 0.25);
+  --dg-sub-text: #e6c46b;
+  --dg-mg-border: #b294f0;
+  --dg-vnet-border: #6cc680;
+  --dg-vnet-bg: rgb(16 50 36 / 0.45);
+  --dg-vnet-text: #93d3a3;
+  --dg-subnet-border: #3b7d4c;
+  --dg-subnet-bg: rgb(19 24 52 / 0.9);
+  --dg-rg-border: #37406e;
+  --dg-rg-bg: rgb(26 32 66 / 0.75);
+  --dg-app-border: #5565d6;
+  --dg-app-bg: rgb(28 35 80 / 0.45);
+  --dg-tier-border: #37406e;
+  --dg-machine-border: #4a5590;
+  --dg-machine-bg: rgb(35 42 82 / 0.55);
+  --dg-nsg: #e87fab;
+  --dg-tier-bg: rgb(26 32 66 / 0.6);
+  --dg-edge: #737ca6;
+  --dg-edge-strong: #a9b1d4;
+  --dg-peering: #6cc680;
+  --dg-private: #8496ff;
+  --dg-route: #eaa850;
+  --dg-rbac: #b294f0;
+  --dg-exposure: #f0667a;
+  --dg-connection: #45b6d1;
+  --dg-dim: 0.22;
+
+  --brand-2: #4fc3f7;
+  --sky: #6fcbf7;
+  --grad-text: linear-gradient(100deg, var(--text) 0%, var(--brand-strong) 55%, #8fdcfb 100%);
+  --grad-number: linear-gradient(120deg, var(--brand-strong) 0%, #8fdcfb 100%);
+  --grad-tile: linear-gradient(145deg, var(--surface-2) 0%, var(--surface) 100%);
+  --aurora-1: rgb(125 143 255 / 0.2);
+  --aurora-2: rgb(79 195 247 / 0.14);
+  --aurora-3: rgb(178 148 240 / 0.13);
+  --glass-bg: rgb(19 24 52 / 0.7);
+  --glass-border: rgb(255 255 255 / 0.09);
+  --glass-edge: inset 0 1px 0 rgb(255 255 255 / 0.07);
+  --spot: rgb(132 150 255 / 0.1);
+  --glow-border: rgb(132 150 255 / 0.55);
+  --glow-sm: 0 8px 24px -9px rgb(125 143 255 / 0.6);
+  --glow: 0 0 0 1px rgb(132 150 255 / 0.24), 0 20px 50px -18px rgb(125 143 255 / 0.5);
+  --glow-dot: 0 0 0 4px rgb(240 102 122 / 0.2);
+
+  --ring: rgb(125 143 255 / 0.55);
+  --overlay: rgb(3 5 16 / 0.64);
+  --highlight: 0 0 #0000;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.25);
+  --shadow-md: 0 14px 30px -12px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 30px 60px -24px rgb(0 0 0 / 0.7);
+  --shadow-float: 0 40px 80px -32px rgb(0 0 0 / 0.75);
+
+  --desk: #080b1c;
+  --desk-grid: rgb(169 177 212 / 0.06);
+  --edge: #05071a;
+  --key-edge: #4453c4;
+  --raise:
+    inset 0 1px 0 rgb(255 255 255 / 0.08), 0 1px 0 var(--edge), 0 3px 0 -1px var(--edge),
+    0 22px 38px -22px rgb(0 0 0 / 0.8);
+  --raise-sm: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 1.5px 0 var(--edge), 0 6px 12px -7px rgb(0 0 0 / 0.6);
+  --raise-hover:
+    inset 0 1px 0 rgb(255 255 255 / 0.12), 0 1px 0 var(--edge), 0 4px 0 -1px var(--edge),
+    0 0 0 1px rgb(132 150 255 / 0.22), 0 26px 48px -22px rgb(125 143 255 / 0.4);
+  --well: inset 0 2px 4px rgb(0 0 0 / 0.4);
+  --card-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.05) 0%, rgb(255 255 255 / 0) 55%);
+  --grad-panel: linear-gradient(180deg, #171d42 0%, #0f1330 100%);
+  --key-shine: inset 0 1px 0 rgb(255 255 255 / 0.4), inset 0 -1px 0 rgb(10 14 60 / 0.22);
+}

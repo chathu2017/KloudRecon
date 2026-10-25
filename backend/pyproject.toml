@@ -1,0 +1,127 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kloudrecon"
+version = "0.1.0"
+description = "KloudRecon for Azure — API, worker and CLI"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "KloudSchool" }]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "gunicorn>=23; sys_platform != 'win32'",
+  "pydantic>=2.9",
+  "pydantic-settings>=2.6",
+  "email-validator>=2.2",
+  "sqlalchemy>=2.0.36",
+  "psycopg[binary]>=3.2",
+  "alembic>=1.14",
+  "structlog>=24.4",
+  "pyjwt[crypto]>=2.10",
+  "httpx>=0.28",
+  "cryptography>=44",
+  "tenacity>=9.0",
+  "limits>=5.0",
+  "apscheduler>=3.10,<4",
+  "psutil>=6.1",
+  "typer>=0.15",
+  "azure-identity>=1.19",
+  "azure-keyvault-secrets>=4.9",
+  "azure-storage-blob>=12.24",
+  "azure-communication-email>=1.0",
+  "azure-monitor-opentelemetry>=1.6",
+  "openai>=1.57",
+  "playwright>=1.49",
+  "python-docx>=1.1",
+  "openpyxl>=3.1",
+  "pyyaml>=6.0.2",
+  "networkx>=3.4",
+  "statsmodels>=0.14.4",
+  # security floor for a transitive dependency (msrest -> requests-oauthlib): CVE-2026-49265
+  "oauthlib>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "pytest-cov>=6.0",
+  "ruff>=0.8",
+  "mypy>=1.13",
+  "pip-audit>=2.7",
+  "types-psutil",
+  "types-openpyxl",
+  "types-PyYAML",
+  "types-networkx",
+]
+
+[project.scripts]
+kloudrecon = "kloudrecon.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kloudrecon = ["py.typed", "notify/templates/*.html", "ai/prompts/*.md", "reports/assets/*.js", "reports/assets/fonts/*.woff2", "reports/assets/fonts/*.txt", "health/scripts/*", "rules/catalog/*.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["alembic/versions/__init__.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF", "ASYNC", "C4", "PT", "DTZ"]
+ignore = [
+  "B008",   # FastAPI Depends() in defaults is idiomatic
+  "S101",   # asserts are fine in tests; guarded by per-file ignores below anyway
+  "N818",   # HTTP-style exception names (NotFound, Forbidden) read better without "Error"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "S311"]
+"alembic/**" = ["E501", "S608"]  # DDL built from constants
+# Setting names like SECRET_STORE / DEV_AUTH_SECRET are not passwords.
+"src/kloudrecon/core/config.py" = ["S105"]
+"src/kloudrecon/services/infra/__init__.py" = ["S105"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["kloudrecon", "tests"]
+known-third-party = ["alembic"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "typer.Option", "typer.Argument"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+mypy_path = "src"
+packages = ["kloudrecon"]
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+  "apscheduler.*",
+  "azure.monitor.opentelemetry.*",
+  "statsmodels.*",
+  "pandas.*",
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra"
+filterwarnings = []
+
+[tool.coverage.run]
+source = ["src/kloudrecon"]
+omit = ["src/kloudrecon/ops/*", "src/kloudrecon/worker/main.py"]

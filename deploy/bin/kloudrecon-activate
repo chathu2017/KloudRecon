@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+# kloudrecon-activate <release-sha>
+#
+# Root-owned release activation for the KloudRecon VM (installed as /usr/local/bin/kloudrecon-activate,
+# run by the GitHub self-hosted runner through sudo; see deploy/sudoers/kloudrecon-deploy).
+#
+#   1. verify the release was built          6. restart api + worker
+#   2. warn if installed config drifted      7. poll /api/v1/health for 60 s
+#   3. ensure Playwright Chromium exists     8. on failure: restore the previous release, exit 1
+#   4. alembic upgrade head (owner role)     9. keep the newest 5 releases
+#   5. atomically switch the `current` symlink
+#
+# Migrations run before the new code starts, so they must be backward compatible
+# (expand -> deploy -> contract). A failed health check rolls back the code, not the schema.
+set -euo pipefail
+
+SHA="${1:-}"
+if [[ ! "$SHA" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "usage: kloudrecon-activate <40-character lowercase git sha>" >&2
+  exit 2
+fi
+
+BASE=/opt/kloudrecon
+RELEASES="$BASE/releases"
+REL="$RELEASES/$SHA"
+CURRENT="$BASE/current"
+ENV_FILE=/etc/kloudrecon/kloudrecon.env
+BROWSERS="$BASE/ms-playwright"
+HEALTH_URL=http://127.0.0.1:8000/api/v1/health
+HEALTH_TIMEOUT=60
+KEEP=5
+SERVICE_USER=kloudrecon
+
+log() { echo "[kloudrecon-activate] $*"; }
+warn() { echo "[kloudrecon-activate] WARNING: $*" >&2; }
+
+# 1. Release must exist and be fully built -------------------------------------------------------
+if [[ ! -f "$REL/.built" ]]; then
+  log "release $SHA is not built ($REL/.built missing)"
+  exit 1
+fi
+if [[ ! -x "$REL/backend/.venv/bin/python" ]]; then
+  log "release $SHA has no virtual environment"
+  exit 1
+fi
+if [[ ! -r "$ENV_FILE" ]]; then
+  log "environment file $ENV_FILE is missing"
+  exit 1
+fi
+
+# 2. Warn when installed server files differ from this release's deploy/ files -------------------
+drift() {
+  local src="$1" dst="$2"
+  if [[ ! -f "$dst" ]]; then
+    warn "$dst is not installed (source: ${src#"$REL"/})"
+  elif ! cmp -s "$src" "$dst"; then
+    warn "$dst differs from ${src#"$REL"/} — reinstall it (infra guide C8)"
+  fi
+}
+for unit in "$REL"/deploy/systemd/*.service "$REL"/deploy/systemd/*.timer; do
+  [[ -e "$unit" ]] && drift "$unit" "/etc/systemd/system/$(basename "$unit")"
+done
+drift "$REL/deploy/sudoers/kloudrecon-deploy" /etc/sudoers.d/kloudrecon-deploy
+drift "$REL/deploy/bin/kloudrecon-activate" /usr/local/bin/kloudrecon-activate
+if [[ -f /etc/caddy/Caddyfile ]]; then
+  # The ACME email line is edited on the server; compare everything else.
+  if ! cmp -s <(grep -v '^[[:space:]]*email[[:space:]]' "$REL/deploy/caddy/Caddyfile") \
+              <(grep -v '^[[:space:]]*email[[:space:]]' /etc/caddy/Caddyfile); then
+    warn "/etc/caddy/Caddyfile differs from deploy/caddy/Caddyfile — reinstall it"
+  fi
+else
+  warn "/etc/caddy/Caddyfile is not installed"
+fi
+
+# 3. Playwright Chromium (PDF reports) ------------------------------------------------------------
+if ! compgen -G "$BROWSERS/chromium-*" > /dev/null; then
+  log "installing Playwright Chromium into $BROWSERS"
+  install -d -o "$SERVICE_USER" -g "$SERVICE_USER" -m 0750 "$BROWSERS"
+  if ! sudo -u "$SERVICE_USER" env PLAYWRIGHT_BROWSERS_PATH="$BROWSERS" HOME="$BASE" \
+      "$REL/backend/.venv/bin/playwright" install chromium; then
+    warn "Chromium install failed; PDF reports will not work until it is installed"
+  fi
+fi
+
+# 4. Migrations as the service user with the owner DB role ---------------------------------------
+# Settings load the env file themselves (values may contain ';'), and alembic's env.py uses
+# DATABASE_MIGRATION_URL (kloudrecon_owner, peer auth).
+log "running database migrations"
+(
+  cd "$REL/backend"
+  sudo -u "$SERVICE_USER" env -i PATH=/usr/bin:/bin HOME="$BASE" \
+    KLOUDRECON_ENV_FILE="$ENV_FILE" PYTHONDONTWRITEBYTECODE=1 \
+    "$REL/backend/.venv/bin/alembic" upgrade head
+)
+
+# 5. Switch the symlink atomically ----------------------------------------------------------------
+PREVIOUS=""
+if [[ -L "$CURRENT" ]]; then
+  PREVIOUS="$(readlink -f "$CURRENT")"
+fi
+switch_to() {
+  ln -sfn "$1" "$CURRENT.new"
+  mv -Tf "$CURRENT.new" "$CURRENT"
+}
+log "activating $SHA (previous: ${PREVIOUS:-none})"
+switch_to "$REL"
+
+# 6-7. Restart and health check -------------------------------------------------------------------
+healthy() {
+  local deadline=$((SECONDS + HEALTH_TIMEOUT))
+  while ((SECONDS < deadline)); do
+    if curl -fsS --max-time 3 "$HEALTH_URL" > /dev/null 2>&1; then
+      return 0
+    fi
+    sleep 2
+  done
+  return 1
+}
+
+systemctl daemon-reload
+systemctl restart kloudrecon-api kloudrecon-worker
+if healthy; then
+  log "healthy: $HEALTH_URL"
+else
+  log "health check failed after ${HEALTH_TIMEOUT}s"
+  journalctl -u kloudrecon-api -n 40 --no-pager || true
+  # 8. Roll back to the previous release
+  if [[ -n "$PREVIOUS" && "$PREVIOUS" != "$REL" && -d "$PREVIOUS" ]]; then
+    log "rolling back to $PREVIOUS"
+    switch_to "$PREVIOUS"
+    systemctl restart kloudrecon-api kloudrecon-worker
+    if healthy; then
+      log "rollback healthy"
+    else
+      log "rollback is ALSO unhealthy — investigate now"
+    fi
+  else
+    log "no previous release to roll back to"
+  fi
+  exit 1
+fi
+
+# 9. Keep the newest $KEEP releases (never the active or previous one) ----------------------------
+ACTIVE="$(readlink -f "$CURRENT")"
+count=0
+while IFS= read -r dir; do
+  dir="${dir%/}"
+  count=$((count + 1))
+  ((count <= KEEP)) && continue
+  resolved="$(readlink -f "$dir")"
+  [[ "$resolved" == "$ACTIVE" || "$resolved" == "$PREVIOUS" ]] && continue
+  log "removing old release $(basename "$dir")"
+  rm -rf -- "$dir"
+done < <(ls -1dt "$RELEASES"/*/ 2> /dev/null)
+
+log "done: $SHA is live"

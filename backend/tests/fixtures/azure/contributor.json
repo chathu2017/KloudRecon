@@ -1,0 +1,175 @@
+[
+  {
+    "method": "POST",
+    "url": "login\\.microsoftonline\\.com/[^/]+/oauth2/v2\\.0/token",
+    "status": 200,
+    "json": {
+      "access_token": {
+        "roles": []
+      },
+      "expires_in": 3599,
+      "token_type": "Bearer"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "management\\.azure\\.com/subscriptions\\?",
+    "status": 200,
+    "json": {
+      "value": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "displayName": "Contoso Test Prod",
+          "state": "Enabled",
+          "subscriptionPolicies": {
+            "quotaId": "PayAsYouGo_2014-09-01",
+            "spendingLimit": "Off"
+          },
+          "authorizationSource": "RoleBased"
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000002",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000002",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "displayName": "Contoso Test Sponsorship",
+          "state": "Enabled",
+          "subscriptionPolicies": {
+            "quotaId": "Sponsored_2016-01-01",
+            "spendingLimit": "Off"
+          },
+          "authorizationSource": "RoleBased"
+        }
+      ],
+      "count": {
+        "type": "Total",
+        "value": 2
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "providers/Microsoft\\.Management/managementGroups\\?",
+    "status": 403,
+    "json": {
+      "error": {
+        "code": "AuthorizationFailed",
+        "message": "The client does not have authorization to perform action 'Microsoft.Management/managementGroups/read' over scope '/providers/Microsoft.Management'."
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "providers/Microsoft\\.Authorization/permissions\\?",
+    "status": 200,
+    "json": {
+      "value": [
+        {
+          "actions": [
+            "*"
+          ],
+          "notActions": [
+            "Microsoft.Authorization/*/Delete",
+            "Microsoft.Authorization/*/Write"
+          ],
+          "dataActions": [],
+          "notDataActions": []
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "providers/Microsoft\\.ResourceGraph/resources\\?",
+    "status": 200,
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "count_": 42
+        }
+      ],
+      "facets": [],
+      "resultTruncated": "false"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft\\.CostManagement/query\\?",
+    "status": 200,
+    "json": {
+      "id": "q",
+      "name": "q",
+      "type": "Microsoft.CostManagement/query",
+      "properties": {
+        "nextLink": null,
+        "columns": [
+          {
+            "name": "Cost",
+            "type": "Number"
+          },
+          {
+            "name": "Currency",
+            "type": "String"
+          }
+        ],
+        "rows": [
+          [
+            123.45,
+            "USD"
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "subscriptions/11111111-aaaa-4bbb-8ccc-000000000002/providers/Microsoft\\.CostManagement/query\\?",
+    "status": 200,
+    "json": {
+      "id": "q",
+      "name": "q",
+      "type": "Microsoft.CostManagement/query",
+      "properties": {
+        "nextLink": null,
+        "columns": [
+          {
+            "name": "Cost",
+            "type": "Number"
+          },
+          {
+            "name": "Currency",
+            "type": "String"
+          }
+        ],
+        "rows": [
+          [
+            123.45,
+            "USD"
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "providers/Microsoft\\.Security/secureScores/ascScore\\?",
+    "status": 200,
+    "json": {
+      "id": "x",
+      "name": "ascScore",
+      "type": "Microsoft.Security/secureScores",
+      "properties": {
+        "displayName": "ASC score",
+        "score": {
+          "max": 58,
+          "current": 33.64,
+          "percentage": 0.58
+        },
+        "weight": 58
+      }
+    }
+  }
+]

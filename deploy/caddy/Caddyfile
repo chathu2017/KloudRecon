@@ -1,0 +1,22 @@
+# /etc/caddy/Caddyfile — HTTPS (Let's Encrypt) in front of the API on 127.0.0.1:8000.
+# Replace <owner-email-for-letsencrypt> once after copying (the activation script ignores
+# the email line when comparing the installed file with the release).
+{
+    email <owner-email-for-letsencrypt>
+}
+api.azurerec.kloudschool.com {
+    encode zstd gzip
+    request_body {
+        max_size 10MB
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+    # flush_interval -1 streams Server-Sent Events without buffering.
+    reverse_proxy 127.0.0.1:8000 {
+        flush_interval -1
+    }
+}

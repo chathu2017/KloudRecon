@@ -1,0 +1,473 @@
+[
+  {
+    "method": "POST",
+    "url": "login\\.microsoftonline\\.com/[^/]+/oauth2/v2\\.0/token",
+    "json": {
+      "access_token": {
+        "roles": []
+      },
+      "expires_in": 3599,
+      "token_type": "Bearer"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "management\\.azure\\.com/subscriptions\\?",
+    "json": {
+      "value": [
+        {
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "displayName": "Contoso Test Prod",
+          "state": "Enabled",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "managementGroups\\?",
+    "status": 403,
+    "json": {
+      "error": {
+        "code": "AuthorizationFailed",
+        "message": "No access."
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "resources | project",
+    "json": {
+      "totalRecords": 5,
+      "count": 5,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app",
+          "name": "vnet-app",
+          "type": "microsoft.network/virtualnetworks",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "addressSpace": {
+              "addressPrefixes": [
+                "10.0.0.0/16"
+              ]
+            },
+            "subnets": [
+              {
+                "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/default",
+                "name": "default",
+                "properties": {
+                  "addressPrefix": "10.0.0.0/24",
+                  "networkSecurityGroup": {
+                    "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkSecurityGroups/nsg-app"
+                  }
+                }
+              }
+            ],
+            "virtualNetworkPeerings": []
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkSecurityGroups/nsg-app",
+          "name": "nsg-app",
+          "type": "microsoft.network/networksecuritygroups",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "securityRules": [
+              {
+                "name": "allow-https",
+                "properties": {
+                  "priority": 100,
+                  "direction": "Inbound",
+                  "access": "Allow",
+                  "protocol": "Tcp",
+                  "sourceAddressPrefix": "VirtualNetwork",
+                  "destinationPortRange": "443"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01",
+          "name": "nic-vm-app01",
+          "type": "microsoft.network/networkinterfaces",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "ipConfigurations": [
+              {
+                "name": "ipconfig1",
+                "properties": {
+                  "subnet": {
+                    "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/default"
+                  },
+                  "privateIPAddress": "10.0.0.4"
+                }
+              }
+            ],
+            "virtualMachine": {
+              "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+            }
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "name": "vm-app01",
+          "type": "microsoft.compute/virtualmachines",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "hardwareProfile": {
+              "vmSize": "Standard_D2s_v5"
+            },
+            "storageProfile": {
+              "osDisk": {
+                "name": "osdisk-vm-app01",
+                "managedDisk": {
+                  "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01"
+                }
+              },
+              "dataDisks": []
+            },
+            "networkProfile": {
+              "networkInterfaces": [
+                {
+                  "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01"
+                }
+              ]
+            },
+            "extended": {
+              "instanceView": {
+                "powerState": {
+                  "code": "PowerState/running"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+          "name": "osdisk-vm-app01",
+          "type": "microsoft.compute/disks",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": {
+            "name": "Premium_LRS"
+          },
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "diskSizeGB": 64,
+            "diskState": "Attached"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "resourcecontainers",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app",
+          "name": "rg-app",
+          "type": "microsoft.resources/subscriptions/resourcegroups",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tags": {},
+          "properties": {}
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "roledefinitions",
+    "json": {
+      "totalRecords": 0,
+      "count": 0,
+      "data": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "roleassignments",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleAssignments/aaaa0000-0000-4000-8000-000000000001",
+          "name": "aaaa0000-0000-4000-8000-000000000001",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "properties": {
+            "principalId": "bbbb0000-0000-4000-8000-000000000001",
+            "principalType": "User",
+            "roleDefinitionId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "eventtypes/management/values",
+    "status": 403,
+    "json": {
+      "error": {
+        "code": "AuthorizationFailed",
+        "message": "No access to the activity log."
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/pricings\\?",
+    "json": {
+      "value": [
+        {
+          "name": "VirtualMachines",
+          "properties": {
+            "pricingTier": "Standard",
+            "subPlan": "P2"
+          }
+        },
+        {
+          "name": "StorageAccounts",
+          "properties": {
+            "pricingTier": "Free"
+          }
+        },
+        {
+          "name": "Arm",
+          "properties": {
+            "pricingTier": "Standard"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/secureScores/ascScore",
+    "json": {
+      "properties": {
+        "score": {
+          "current": 30.5,
+          "max": 58,
+          "percentage": 0.5259
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/(securityContacts|assessments|subAssessments|alerts)\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Advisor/recommendations\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "policyStates/latest/summarize",
+    "json": {
+      "value": [
+        {
+          "results": {
+            "nonCompliantResources": 0,
+            "nonCompliantPolicies": 0
+          },
+          "policyAssignments": []
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Insights/diagnosticSettings\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Authorization/locks\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Consumption/budgets\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Compute/locations/[^/]+/usages\\?",
+    "json": {
+      "value": [
+        {
+          "name": {
+            "value": "cores",
+            "localizedValue": "Total Regional vCPUs"
+          },
+          "currentValue": 4,
+          "limit": 10,
+          "unit": "Count"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "(firewallRules|/keys|/secrets)\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "auditingSettings/default",
+    "json": {
+      "properties": {
+        "state": "Disabled"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "recoveryservicesresources",
+    "json": {
+      "totalRecords": 0,
+      "count": 0,
+      "data": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "patchassessmentresults') | project",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01/patchAssessmentResults/latest",
+          "type": "microsoft.compute/virtualmachines/patchassessmentresults",
+          "properties": {
+            "status": "Succeeded",
+            "osType": "Linux",
+            "rebootPending": false,
+            "lastModifiedDateTime": "2026-09-25T06:00:00Z",
+            "availablePatchCountByClassification": {
+              "security": 3,
+              "other": 7
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "softwarepatches') | project",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01/patchAssessmentResults/latest/softwarePatches/openssl",
+          "type": "microsoft.compute/virtualmachines/patchassessmentresults/softwarepatches",
+          "properties": {
+            "patchName": "openssl",
+            "version": "3.0.13-0ubuntu3.6",
+            "classifications": [
+              "Security"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

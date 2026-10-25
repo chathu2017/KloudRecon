@@ -1,0 +1,38 @@
+# KloudRecon API (FastAPI on gunicorn + uvicorn workers), behind Caddy on 127.0.0.1:8000.
+# Install: sudo cp deploy/systemd/*.service deploy/systemd/*.timer /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now kloudrecon-api
+[Unit]
+Description=KloudRecon API
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=kloudrecon
+Group=kloudrecon
+WorkingDirectory=/opt/kloudrecon/current/backend
+EnvironmentFile=/etc/kloudrecon/kloudrecon.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/kloudrecon/current/backend/.venv/bin/gunicorn kloudrecon.api.main:app -k uvicorn.workers.UvicornWorker -w 3 -b 127.0.0.1:8000 --timeout 120 --graceful-timeout 30
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=40
+Restart=always
+RestartSec=3
+
+# Hardening
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

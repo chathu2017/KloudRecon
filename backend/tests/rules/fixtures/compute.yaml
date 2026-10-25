@@ -1,0 +1,68 @@
+x-vmid: &vmid /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1
+
+vm-unmanaged-disks:
+  pass: {properties: {storageProfile: {osDisk: {managedDisk: {id: /d1}}}}}
+  fail: {properties: {storageProfile: {osDisk: {vhd: {uri: https://st.blob.core.windows.net/vhds/os.vhd}}}}}
+vm-no-trusted-launch:
+  pass: {properties: {securityProfile: {securityType: TrustedLaunch}}}
+  fail: {properties: {securityProfile: {}}}
+vm-no-endpoint-protection:
+  pass:
+    resources:
+      - {id: *vmid, name: vm1, properties: {storageProfile: {osDisk: {osType: Windows}}}}
+      - {id: "/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1/extensions/MDE.Windows", name: MDE.Windows, type: microsoft.compute/virtualmachines/extensions, properties: {type: MDE.Windows}}
+  fail:
+    resources:
+      - {id: *vmid, name: vm1, properties: {storageProfile: {osDisk: {osType: Windows}}}}
+      - {id: "/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1/extensions/AzureMonitorWindowsAgent", name: AzureMonitorWindowsAgent, type: microsoft.compute/virtualmachines/extensions, properties: {type: AzureMonitorWindowsAgent}}
+    expect: [vm1]
+vm-no-monitoring-agent:
+  pass:
+    resources:
+      - {id: *vmid, name: vm1}
+      - {id: "/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1/extensions/AzureMonitorLinuxAgent", name: AzureMonitorLinuxAgent, type: microsoft.compute/virtualmachines/extensions, properties: {type: AzureMonitorLinuxAgent}}
+  fail:
+    resources: [{id: *vmid, name: vm1}]
+vm-linux-password-auth:
+  pass: {properties: {osProfile: {linuxConfiguration: {disablePasswordAuthentication: true}}}}
+  fail: {properties: {osProfile: {linuxConfiguration: {disablePasswordAuthentication: false}}}}
+vm-no-auto-patching:
+  pass: [{properties: {osProfile: {windowsConfiguration: {patchSettings: {patchMode: AutomaticByOS}}}}}, {properties: {osProfile: {linuxConfiguration: {patchSettings: {patchMode: AutomaticByPlatform}}}}}]
+  fail: [{properties: {osProfile: {linuxConfiguration: {patchSettings: {patchMode: ImageDefault}}}}}, {properties: {osProfile: {windowsConfiguration: {patchSettings: {patchMode: Manual}}}}}]
+vm-public-ip-attached:
+  pass:
+    resources:
+      - {id: *vmid, name: vm1, properties: {networkProfile: {networkInterfaces: [{id: /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.network/networkinterfaces/nic1}]}}}
+      - {type: microsoft.network/networkinterfaces, name: nic1, properties: {ipConfigurations: [{name: ipconfig1, properties: {privateIPAddress: 10.0.0.4}}]}}
+  fail:
+    resources:
+      - {id: *vmid, name: vm1, properties: {networkProfile: {networkInterfaces: [{id: /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.network/networkinterfaces/nic1}]}}}
+      - {type: microsoft.network/networkinterfaces, name: nic1, properties: {ipConfigurations: [{name: ipconfig1, properties: {publicIPAddress: {id: /pip1}}}]}}
+    expect: [vm1]
+vm-boot-diagnostics-off:
+  pass: {properties: {diagnosticsProfile: {bootDiagnostics: {enabled: true}}}}
+  fail: {properties: {diagnosticsProfile: {bootDiagnostics: {enabled: false}}}}
+vm-unsupported-os:
+  pass: [{properties: {storageProfile: {imageReference: {offer: WindowsServer, sku: 2022-datacenter-azure-edition}}}}, {properties: {storageProfile: {imageReference: {offer: 0001-com-ubuntu-server-jammy, sku: 22_04-lts-gen2}}}}]
+  fail: [{properties: {storageProfile: {imageReference: {offer: WindowsServer, sku: 2012-R2-Datacenter}}}}, {properties: {storageProfile: {imageReference: {offer: UbuntuServer, sku: 18.04-LTS}}}}]
+vm-no-availability-production:
+  pass: [{tags: {env: prod}, zones: ["1"]}, {tags: {env: prod}, properties: {availabilitySet: {id: /as1}}}]
+  fail: {tags: {env: prod}, properties: {}}
+vm-retired-size:
+  pass: {properties: {hardwareProfile: {vmSize: Standard_D2s_v5}}}
+  fail: {properties: {hardwareProfile: {vmSize: Standard_A2}}}
+vm-no-encryption-at-host:
+  pass: {tags: {data-classification: confidential}, properties: {securityProfile: {encryptionAtHost: true}}}
+  fail: {tags: {data-classification: confidential}, properties: {securityProfile: {}}}
+disk-cmk-confidential:
+  pass: {tags: {data-classification: confidential}, properties: {encryption: {type: EncryptionAtRestWithCustomerKey}}}
+  fail: {tags: {data-classification: confidential}, properties: {encryption: {type: EncryptionAtRestWithPlatformKey}}}
+disk-network-access-open:
+  pass: {properties: {networkAccessPolicy: DenyAll}}
+  fail: [{properties: {networkAccessPolicy: AllowAll}}, {type: microsoft.compute/snapshots, properties: {networkAccessPolicy: AllowAll}}]
+vmss-no-zones-production:
+  pass: {tags: {env: prod}, zones: ["1", "2", "3"]}
+  fail: {tags: {env: prod}, zones: ["1"]}
+vmss-no-auto-os-upgrade:
+  pass: {properties: {upgradePolicy: {automaticOSUpgradePolicy: {enableAutomaticOSUpgrade: true}}}}
+  fail: {properties: {upgradePolicy: {mode: Manual}}}

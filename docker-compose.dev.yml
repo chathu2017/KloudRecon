@@ -1,0 +1,46 @@
+# Local development ONLY: supporting services. The API, worker and web app run directly
+# (uvicorn / python / npm). Production uses native PostgreSQL on the VM, never Docker.
+name: kloudrecon-dev
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: kloudrecon
+      POSTGRES_PASSWORD: kloudrecon
+      POSTGRES_DB: kloudrecon
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Creates the kloudrecon_app role (RLS-enforced) and the kloudrecon_test database.
+      - ./deploy/postgres/local/00-local-init.sql:/docker-entrypoint-initdb.d/00-local-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kloudrecon -d kloudrecon"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --loose --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+    volumes:
+      - azurite:/data
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  azurite:

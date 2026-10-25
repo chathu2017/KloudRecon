@@ -1,0 +1,183 @@
+# Fixtures for Azure RBAC rules. `rbac` rows use the stored rbac_assignments shape.
+x-sub: &sub "00000000-0000-4000-8000-000000000001"
+x-scope: &sub_scope /subscriptions/00000000-0000-4000-8000-000000000001
+
+x-owner: &owner {assignment_id: /a/1, principal_id: u1, principal_type: User, principal_name: Alice, role_name: Owner, role_def_id: 8e3af657-a8ff-443c-a75c-2fe8c4bcb635, scope: *sub_scope, subscription_id: *sub, is_privileged: true, is_custom: false}
+x-reader: &reader {assignment_id: /a/9, principal_id: g1, principal_type: Group, principal_name: Readers, role_name: Reader, role_def_id: acdd72a7-3385-48ef-bd42-f606fba81ae7, scope: *sub_scope, subscription_id: *sub, is_privileged: false, is_custom: false}
+x-entra: &entra
+  users:
+    - {id: u1, displayName: Alice, userPrincipalName: alice@contoso.example, userType: Member, accountEnabled: true, lastSignIn: "2026-08-25T00:00:00Z", mfaRegistered: true, methods: [push]}
+    - {id: u2, displayName: Gus Guest, userPrincipalName: gus_partner#EXT#@contoso.example, userType: Guest, accountEnabled: true, lastSignIn: "2026-03-01T00:00:00Z", mfaRegistered: false, methods: []}
+    - {id: u3, displayName: Old Admin, userPrincipalName: old@contoso.example, userType: Member, accountEnabled: false, lastSignIn: "2025-01-01T00:00:00Z", mfaRegistered: false, methods: []}
+  groups: [{id: g1, displayName: Readers}]
+  servicePrincipals: [{id: sp1, appId: app1, displayName: deploy, type: Application}]
+  directoryRoles: []
+  applications: []
+  conditionalAccess: []
+
+iam-owner-too-many:
+  pass:
+    context: {rbac: [*owner, *reader]}
+  fail:
+    context:
+      rbac:
+        - {<<: *owner, assignment_id: /a/1, principal_id: u1}
+        - {<<: *owner, assignment_id: /a/2, principal_id: u2}
+        - {<<: *owner, assignment_id: /a/3, principal_id: u3}
+        - {<<: *owner, assignment_id: /a/4, principal_id: u4}
+
+iam-contributor-too-many:
+  pass:
+    context: {rbac: [{<<: *owner, role_name: Contributor}]}
+  fail:
+    context:
+      rbac:
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/1}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/2}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/3}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/4}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/5}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/6}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/7}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/8}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/9}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/10}
+        - {<<: *owner, role_name: Contributor, assignment_id: /a/11}
+
+iam-sp-owner:
+  pass:
+    context: {rbac: [{<<: *owner, principal_type: ServicePrincipal, scope: /subscriptions/00000000-0000-4000-8000-000000000001/resourceGroups/rg1}]}
+  fail:
+    context: {rbac: [{<<: *owner, principal_type: ServicePrincipal, principal_id: sp1}]}
+
+iam-sp-contributor-subscription:
+  pass:
+    context: {rbac: [{<<: *owner, principal_type: ServicePrincipal, role_name: Contributor, scope: /subscriptions/00000000-0000-4000-8000-000000000001/resourceGroups/rg1}]}
+  fail:
+    context: {rbac: [{<<: *owner, principal_type: ServicePrincipal, role_name: Contributor}]}
+
+iam-uaa-assignment:
+  pass:
+    context: {rbac: [*owner]}
+  fail:
+    context: {rbac: [{<<: *owner, principal_type: ServicePrincipal, role_name: User Access Administrator}]}
+
+iam-user-direct-privileged:
+  pass:
+    context: {rbac: [{<<: *owner, principal_type: Group}]}
+  fail:
+    context: {rbac: [*owner]}
+
+iam-privileged-at-management-group:
+  pass:
+    context: {rbac: [*owner]}
+  fail:
+    context: {rbac: [{<<: *owner, scope: /providers/Microsoft.Management/managementGroups/mg-corp, subscription_id: null}]}
+
+iam-root-scope-assignment:
+  pass:
+    context: {rbac: [{<<: *owner, scope: /providers/Microsoft.Management/managementGroups/mg-corp, subscription_id: null}]}
+  fail:
+    - context: {rbac: [{<<: *owner, scope: /, subscription_id: null}]}
+    - context: {rbac: [{<<: *owner, scope: /providers/Microsoft.Management/managementGroups/00000000-0000-4000-8000-0000000000aa, subscription_id: null}]}
+
+iam-data-owner-role:
+  pass:
+    context: {rbac: [{<<: *owner, role_name: Storage Blob Data Reader, is_privileged: false}]}
+  fail:
+    context: {rbac: [{<<: *owner, role_name: Storage Blob Data Owner, is_privileged: false}]}
+
+iam-keyvault-role-broad-scope:
+  pass:
+    context: {rbac: [{<<: *owner, role_name: Key Vault Secrets User, scope: /subscriptions/00000000-0000-4000-8000-000000000001/resourceGroups/rg1/providers/Microsoft.KeyVault/vaults/kv1}]}
+  fail:
+    context: {rbac: [{<<: *owner, role_name: Key Vault Secrets User}]}
+
+iam-guest-privileged:
+  pass:
+    context: {entra: *entra, rbac: [*owner]}
+  fail:
+    context: {entra: *entra, rbac: [{<<: *owner, principal_id: u2}]}
+
+iam-stale-privileged-user:
+  pass:
+    context: {entra: *entra, rbac: [*owner]}
+  fail:
+    context: {entra: *entra, rbac: [{<<: *owner, principal_id: u2}]}
+
+iam-disabled-user-assignment:
+  pass:
+    context: {entra: *entra, rbac: [*owner]}
+  fail:
+    context: {entra: *entra, rbac: [{<<: *owner, principal_id: u3}]}
+
+iam-privileged-without-mfa:
+  pass:
+    context: {entra: *entra, rbac: [*owner]}
+  fail:
+    context: {entra: *entra, rbac: [{<<: *owner, principal_id: u2}]}
+
+iam-orphaned-assignment:
+  pass:
+    context: {entra: *entra, rbac: [*owner, *reader]}
+  fail:
+    context: {entra: *entra, rbac: [{<<: *owner, principal_id: deleted-principal, principal_type: Unknown}]}
+
+iam-assignment-sprawl:
+  pass:
+    context: {rbac: [*owner, *reader]}
+  fail:
+    context:
+      rbac:
+        - {<<: *reader, assignment_id: /a/1}
+        - {<<: *reader, assignment_id: /a/2}
+        - {<<: *reader, assignment_id: /a/3}
+        - {<<: *reader, assignment_id: /a/4}
+        - {<<: *reader, assignment_id: /a/5}
+        - {<<: *reader, assignment_id: /a/6}
+        - {<<: *reader, assignment_id: /a/7}
+        - {<<: *reader, assignment_id: /a/8}
+        - {<<: *reader, assignment_id: /a/9}
+        - {<<: *reader, assignment_id: /a/10}
+        - {<<: *reader, assignment_id: /a/11}
+
+iam-custom-role-wildcard:
+  pass:
+    context: {role_definitions: [{name: r1, properties: {roleName: VM Operator, type: CustomRole, permissions: [{actions: ["Microsoft.Compute/virtualMachines/*"]}], assignableScopes: [/subscriptions/x]}}]}
+  fail:
+    context: {role_definitions: [{name: r1, properties: {roleName: God Mode, type: CustomRole, permissions: [{actions: ["*"]}], assignableScopes: [/subscriptions/x]}}]}
+
+iam-custom-role-assign-rights:
+  pass:
+    context: {role_definitions: [{name: r1, properties: {roleName: VM Operator, type: CustomRole, permissions: [{actions: ["*/read"]}], assignableScopes: [/subscriptions/x]}}]}
+  fail:
+    context: {role_definitions: [{name: r1, properties: {roleName: App Operator, type: CustomRole, permissions: [{actions: ["*/read", "Microsoft.Authorization/roleAssignments/write"]}], assignableScopes: [/subscriptions/x]}}]}
+
+iam-custom-role-unused:
+  pass:
+    context:
+      role_definitions: [{name: r1, properties: {roleName: VM Operator, type: CustomRole, permissions: [{actions: ["*/read"]}]}}]
+      rbac: [{<<: *owner, role_def_id: r1, role_name: VM Operator}]
+  fail:
+    context:
+      role_definitions: [{name: r1, properties: {roleName: VM Operator, type: CustomRole, permissions: [{actions: ["*/read"]}]}}]
+      rbac: [*owner]
+
+iam-custom-role-root-assignable:
+  pass:
+    context: {role_definitions: [{name: r1, properties: {roleName: Ops, type: CustomRole, permissions: [{actions: ["*/read"]}], assignableScopes: [/subscriptions/x]}}]}
+  fail:
+    context: {role_definitions: [{name: r1, properties: {roleName: Ops, type: CustomRole, permissions: [{actions: ["*/read"]}], assignableScopes: ["/"]}}]}
+
+iam-exposed-identity-privileged:
+  pass:
+    resources: [{type: microsoft.compute/virtualmachines, name: vm1, identity: {type: SystemAssigned, principalId: mi1}}]
+    context:
+      exposure: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1": {ports: [{port: 443}]}}
+      rbac: [{<<: *reader, principal_id: mi1, principal_type: ServicePrincipal}]
+  fail:
+    resources: [{type: microsoft.compute/virtualmachines, name: vm1, identity: {type: SystemAssigned, principalId: mi1}}]
+    context:
+      exposure: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1": {ports: [{port: 3389}]}}
+      rbac: [{<<: *owner, principal_id: mi1, principal_type: ServicePrincipal, role_name: Contributor}]
+    expect: [vm1]

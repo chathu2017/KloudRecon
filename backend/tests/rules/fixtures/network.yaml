@@ -1,0 +1,178 @@
+# Pass/fail fixtures for network rules. A case is a resource patch or {resources, context}.
+x-rule: &rdp_any {name: allow-rdp, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "3389"}}
+
+net-nsg-rdp-internet:
+  pass:
+    - properties: {securityRules: [{name: rdp-corp, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: 10.0.0.0/8, destinationPortRange: "3389"}}]}
+    - properties: {securityRules: [{name: https, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: Internet, destinationPortRange: "443"}}]}
+  fail:
+    - properties: {securityRules: [*rdp_any]}
+    - properties: {securityRules: [{name: range, properties: {priority: 200, direction: Inbound, access: Allow, protocol: "*", sourceAddressPrefixes: [198.51.100.0/24], destinationPortRange: "3000-4000"}}]}
+
+net-nsg-ssh-internet:
+  pass: {properties: {securityRules: [{name: ssh-bastion, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: 10.0.3.0/26, destinationPortRange: "22"}}]}}
+  fail: {properties: {securityRules: [{name: ssh, properties: {priority: 300, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: Internet, destinationPortRange: "22"}}]}}
+
+net-nsg-all-ports-internet:
+  pass: {properties: {securityRules: [*rdp_any]}}
+  fail: {properties: {securityRules: [{name: all, properties: {priority: 100, direction: Inbound, access: Allow, protocol: "*", sourceAddressPrefix: "*", destinationPortRange: "*"}}]}}
+
+net-nsg-db-ports-internet:
+  pass: {properties: {securityRules: [{name: sql-app, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: 10.1.1.0/24, destinationPortRange: "1433"}}]}}
+  fail: {properties: {securityRules: [{name: pg, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRanges: ["5432", "6379"]}}]}}
+
+net-nsg-smb-internet:
+  pass: {properties: {securityRules: [{name: smb-deny, properties: {priority: 100, direction: Inbound, access: Deny, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "445"}}]}}
+  fail: {properties: {securityRules: [{name: smb, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: Internet, destinationPortRange: "445"}}]}}
+
+net-nsg-winrm-internet:
+  pass: {properties: {securityRules: [{name: winrm-out, properties: {priority: 100, direction: Outbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "5986"}}]}}
+  fail: {properties: {securityRules: [{name: winrm, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "5985-5986"}}]}}
+
+net-nsg-legacy-protocols-internet:
+  pass: {properties: {securityRules: [{name: web, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "443"}}]}}
+  fail: {properties: {securityRules: [{name: telnet, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "23"}}]}}
+
+net-nsg-http-plain-internet:
+  pass: {properties: {securityRules: [{name: https, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: Internet, destinationPortRange: "443"}}]}}
+  fail: {properties: {securityRules: [{name: http, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "80"}}]}}
+
+net-nsg-udp-internet:
+  pass: {properties: {securityRules: [{name: dns-tcp, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "53"}}]}}
+  fail: {properties: {securityRules: [{name: dns, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Udp, sourceAddressPrefix: "*", destinationPortRange: "53"}}]}}
+
+net-nsg-wide-port-range:
+  pass: {properties: {securityRules: [{name: app, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "8000-8010"}}]}}
+  fail: {properties: {securityRules: [{name: range, properties: {priority: 100, direction: Inbound, access: Allow, protocol: Tcp, sourceAddressPrefix: "*", destinationPortRange: "10000-20000"}}]}}
+
+net-nsg-unused:
+  pass: {properties: {subnets: [{id: /x/subnets/a}], networkInterfaces: []}}
+  fail: {properties: {subnets: [], networkInterfaces: []}}
+
+net-subnet-no-nsg:
+  pass:
+    type: microsoft.network/virtualnetworks
+    properties:
+      subnets:
+        - {name: snet-app, properties: {addressPrefix: 10.0.1.0/24, networkSecurityGroup: {id: /nsg}}}
+        - {name: GatewaySubnet, properties: {addressPrefix: 10.0.2.0/27}}
+  fail:
+    type: microsoft.network/virtualnetworks
+    properties:
+      subnets:
+        - {name: snet-app, properties: {addressPrefix: 10.0.1.0/24}}
+
+net-vm-management-exposed:
+  pass:
+    resources: [{name: vm1}]
+    context: {exposure: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1": {public_ip: 203.0.113.5, ports: [{port: 443, rule: https}]}}}
+  fail:
+    resources: [{name: vm1}]
+    context: {exposure: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1": {public_ip: 203.0.113.5, ports: [{port: 3389, rule: allow-rdp}]}}}
+    expect: [vm1]
+
+net-network-watcher-missing:
+  pass:
+    resources:
+      - {type: microsoft.network/virtualnetworks, name: vnet1, location: eastus}
+      - {type: microsoft.network/networkwatchers, name: NetworkWatcher_eastus, location: eastus}
+  fail:
+    resources:
+      - {type: microsoft.network/virtualnetworks, name: vnet1, location: westeurope}
+      - {type: microsoft.network/networkwatchers, name: NetworkWatcher_eastus, location: eastus}
+
+net-bastion-missing:
+  pass:
+    resources:
+      - {type: microsoft.compute/virtualmachines, name: vm1}
+      - {type: microsoft.network/bastionhosts, name: bas1}
+  fail:
+    resources: [{type: microsoft.compute/virtualmachines, name: vm1}]
+
+net-pip-basic-sku:
+  pass: {sku: {name: Standard}}
+  fail: {sku: {name: Basic}}
+
+net-vnet-no-ddos:
+  pass: {tags: {env: prod}, properties: {enableDdosProtection: true}}
+  fail: {tags: {env: prod}, properties: {enableDdosProtection: false}}
+
+net-appgw-no-waf:
+  pass: {properties: {sku: {tier: WAF_v2}, firewallPolicy: {id: /waf}}}
+  fail: {properties: {sku: {tier: Standard_v2}}}
+
+net-appgw-waf-detection:
+  pass: {properties: {policySettings: {state: Enabled, mode: Prevention}}}
+  fail: {properties: {policySettings: {state: Enabled, mode: Detection}}}
+
+net-appgw-waf-disabled:
+  pass: {properties: {policySettings: {state: Enabled}}}
+  fail: {properties: {policySettings: {state: Disabled}}}
+
+net-waf-old-ruleset:
+  pass: {properties: {managedRules: {managedRuleSets: [{ruleSetType: OWASP, ruleSetVersion: "3.2"}]}}}
+  fail: {properties: {managedRules: {managedRuleSets: [{ruleSetType: OWASP, ruleSetVersion: "3.0"}]}}}
+
+net-appgw-old-tls:
+  pass: {properties: {sslPolicy: {policyType: Predefined, policyName: AppGwSslPolicy20220101, minProtocolVersion: TLSv1_2}}}
+  fail: {properties: {sslPolicy: {policyType: Predefined, policyName: AppGwSslPolicy20170401S, minProtocolVersion: TLSv1_1}}}
+
+net-appgw-v1-sku:
+  pass: {properties: {sku: {name: WAF_v2, tier: WAF_v2}}}
+  fail: {properties: {sku: {name: Standard_Medium, tier: Standard}}}
+
+net-fd-no-waf:
+  pass: {kind: frontdoor, properties: {securityPolicies: [{wafPolicy: {id: /waf}}]}}
+  fail: {kind: frontdoor, properties: {securityPolicies: []}}
+
+net-fd-waf-detection:
+  pass: {properties: {policySettings: {mode: Prevention}}}
+  fail: {properties: {policySettings: {mode: Detection}}}
+
+net-fd-waf-disabled:
+  pass: {properties: {policySettings: {enabledState: Enabled}}}
+  fail: {properties: {policySettings: {enabledState: Disabled}}}
+
+net-firewall-threat-intel-off:
+  pass: {properties: {threatIntelMode: Deny}}
+  fail: {properties: {threatIntelMode: "Off"}}
+
+net-firewall-threat-intel-alert:
+  pass: {properties: {threatIntelMode: Deny}}
+  fail: {properties: {threatIntelMode: Alert}}
+
+net-firewall-no-idps:
+  pass: {tags: {env: prod}, properties: {sku: {tier: Premium}, intrusionDetection: {mode: Deny}}}
+  fail: {tags: {env: prod}, properties: {sku: {tier: Standard}}}
+
+net-firewall-no-dns-proxy:
+  pass: {properties: {dnsSettings: {enableProxy: true}}}
+  fail: {properties: {dnsSettings: {}}}
+
+net-pe-not-approved:
+  pass: {properties: {privateLinkServiceConnections: [{properties: {privateLinkServiceConnectionState: {status: Approved}}}]}}
+  fail: {properties: {privateLinkServiceConnections: [{properties: {privateLinkServiceConnectionState: {status: Pending}}}]}}
+
+net-peering-disconnected:
+  pass: {properties: {virtualNetworkPeerings: [{name: p1, properties: {peeringState: Connected}}]}}
+  fail: {properties: {virtualNetworkPeerings: [{name: p1, properties: {peeringState: Connected}}, {name: p2, properties: {peeringState: Disconnected}}]}}
+
+net-vpngw-basic-sku:
+  pass: {properties: {sku: {name: VpnGw2AZ}}}
+  fail: {properties: {sku: {name: Basic}}}
+
+net-vpngw-not-active-active:
+  pass: {tags: {env: prod}, properties: {gatewayType: Vpn, activeActive: true}}
+  fail: {tags: {env: prod}, properties: {gatewayType: Vpn, activeActive: false}}
+
+net-lb-basic-sku:
+  pass: {sku: {name: Standard}}
+  fail: {sku: {name: Basic}}
+
+net-private-dns-no-links:
+  pass: {properties: {numberOfVirtualNetworkLinks: 2}}
+  fail: {properties: {numberOfVirtualNetworkLinks: 0}}
+
+net-nic-ip-forwarding:
+  pass: {properties: {enableIPForwarding: false}}
+  fail: {properties: {enableIPForwarding: true}}

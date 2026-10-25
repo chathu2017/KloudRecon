@@ -1,0 +1,17 @@
+[
+  {
+    "method": "POST",
+    "url": "login\\.microsoftonline\\.com/[^/]+/oauth2/v2\\.0/token",
+    "status": 400,
+    "json": {
+      "error": "invalid_client",
+      "error_description": "AADSTS700016: Application with identifier '33333333-cccc-4ddd-8eee-000000000000' was not found in the directory 'Contoso Test'. Trace ID: 0f5c8d2e-0000-4000-8000-000000000001 Correlation ID: 5a1b2c3d-0000-4000-8000-000000000002 Timestamp: 2026-09-26 10:00:00Z",
+      "error_codes": [
+        700016
+      ],
+      "timestamp": "2026-09-26 10:00:00Z",
+      "trace_id": "0f5c8d2e-0000-4000-8000-000000000001",
+      "correlation_id": "5a1b2c3d-0000-4000-8000-000000000002"
+    }
+  }
+]

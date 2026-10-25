@@ -1,0 +1,12 @@
+# Daily at 02:30 UTC (the VM runs in UTC). Persistent: runs at boot if a run was missed.
+[Unit]
+Description=Nightly KloudRecon database backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+RandomizedDelaySec=300
+Persistent=true
+Unit=kloudrecon-backup.service
+
+[Install]
+WantedBy=timers.target

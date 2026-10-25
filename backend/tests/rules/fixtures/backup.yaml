@@ -1,0 +1,54 @@
+x-sub: &sub "00000000-0000-4000-8000-000000000001"
+
+bkp-vm-not-protected:
+  pass: {resources: [{name: vm1, tags: {env: prod}}], context: {backup_protected: ["/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1"]}}
+  fail: {resources: [{name: vm1, tags: {env: prod}}], context: {backup_protected: []}}
+bkp-vault-soft-delete-off:
+  pass: {properties: {securitySettings: {softDeleteSettings: {softDeleteState: AlwaysON}}}}
+  fail: {properties: {securitySettings: {softDeleteSettings: {softDeleteState: Disabled}}}}
+bkp-vault-immutability-off:
+  pass: {properties: {securitySettings: {immutabilitySettings: {state: Locked}}}}
+  fail: {properties: {securitySettings: {immutabilitySettings: {state: Disabled}}}}
+bkp-vault-lrs:
+  pass: {properties: {redundancySettings: {standardTierStorageRedundancy: GeoRedundant}}}
+  fail: {properties: {redundancySettings: {standardTierStorageRedundancy: LocallyRedundant}}}
+bkp-vault-no-cross-region-restore:
+  pass: {properties: {redundancySettings: {standardTierStorageRedundancy: GeoRedundant, crossRegionRestore: Enabled}}}
+  fail: {properties: {redundancySettings: {standardTierStorageRedundancy: GeoRedundant, crossRegionRestore: Disabled}}}
+bkp-vault-public-network:
+  pass: {properties: {publicNetworkAccess: Disabled}}
+  fail: {properties: {publicNetworkAccess: Enabled}}
+rel-single-vm-workload:
+  pass:
+    prod: true
+    resources: [{type: microsoft.compute/virtualmachines, name: vm1}, {type: microsoft.compute/virtualmachines, name: vm2}]
+  fail:
+    prod: true
+    resources: [{type: microsoft.compute/virtualmachines, name: vm1}]
+rel-lb-no-health-probe:
+  pass: {properties: {loadBalancingRules: [{name: https}], probes: [{name: p}]}}
+  fail: {properties: {loadBalancingRules: [{name: https}], probes: []}}
+rel-appgw-no-zones:
+  pass: {tags: {env: prod}, zones: ["1", "2", "3"]}
+  fail: {tags: {env: prod}, zones: null}
+rel-appgw-low-capacity:
+  pass: [{tags: {env: prod}, properties: {sku: {capacity: 2}}}, {tags: {env: prod}, properties: {autoscaleConfiguration: {minCapacity: 2}}}]
+  fail: {tags: {env: prod}, properties: {sku: {capacity: 1}}}
+rel-public-ip-no-zones:
+  pass: {tags: {env: prod}, sku: {name: Standard}, zones: ["1", "2", "3"]}
+  fail: {tags: {env: prod}, sku: {name: Standard}, zones: null}
+rel-firewall-no-zones:
+  pass: {tags: {env: prod}, zones: ["1", "2", "3"]}
+  fail: {tags: {env: prod}, zones: ["1"]}
+rel-vpngw-no-zones:
+  pass: {tags: {env: prod}, properties: {sku: {name: VpnGw2AZ}}}
+  fail: {tags: {env: prod}, properties: {sku: {name: VpnGw2}}}
+rel-messaging-no-zone-redundancy:
+  pass: {tags: {env: prod}, properties: {zoneRedundant: true}}
+  fail: {tags: {env: prod}, properties: {zoneRedundant: false}}
+rel-avset-single-vm:
+  pass: {properties: {virtualMachines: [{id: /a}, {id: /b}]}}
+  fail: {properties: {virtualMachines: [{id: /a}]}}
+rel-quota-high:
+  pass: {context: {quotas: {*sub : [{location: eastus, name: cores, localized: Total Regional vCPUs, current: 100, limit: 350}]}}}
+  fail: {context: {quotas: {*sub : [{location: eastus, name: cores, localized: Total Regional vCPUs, current: 300, limit: 350}]}}}

@@ -1,0 +1,26 @@
+# Nightly PostgreSQL dump (pg_dump -Fc) -> Blob db-backups/ with the VM managed identity.
+# Started by kloudrecon-backup.timer. Check: journalctl -u kloudrecon-backup -n 20 --no-pager
+[Unit]
+Description=KloudRecon database backup to Blob Storage
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=oneshot
+User=kloudrecon
+Group=kloudrecon
+WorkingDirectory=/opt/kloudrecon/current/backend
+EnvironmentFile=/etc/kloudrecon/kloudrecon.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/kloudrecon/current/backend/.venv/bin/python -m kloudrecon.ops.backup
+TimeoutStartSec=3600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+UMask=0077

@@ -1,0 +1,86 @@
+x-sql-id: &sql_id /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.sql/servers/res1
+
+sql-firewall-allow-all:
+  pass: {context: {sql: {*sql_id : {firewallRules: [{name: office, properties: {startIpAddress: 203.0.113.1, endIpAddress: 203.0.113.20}}]}}}}
+  fail: {context: {sql: {*sql_id : {firewallRules: [{name: AllowAll, properties: {startIpAddress: 0.0.0.0, endIpAddress: 255.255.255.255}}]}}}}
+sql-firewall-azure-services:
+  pass: {context: {sql: {*sql_id : {firewallRules: []}}}}
+  fail: {context: {sql: {*sql_id : {firewallRules: [{name: AllowAllWindowsAzureIps, properties: {startIpAddress: 0.0.0.0, endIpAddress: 0.0.0.0}}]}}}}
+sql-public-network:
+  pass: {properties: {publicNetworkAccess: Disabled}}
+  fail: {properties: {publicNetworkAccess: Enabled}}
+sql-no-entra-admin:
+  pass: {properties: {administrators: {administratorType: ActiveDirectory, azureADOnlyAuthentication: true}}}
+  fail: {properties: {administratorLogin: sqladmin}}
+sql-entra-only-off:
+  pass: {properties: {administrators: {administratorType: ActiveDirectory, azureADOnlyAuthentication: true}}}
+  fail: {properties: {administrators: {azureADOnlyAuthentication: false}}}
+sql-min-tls:
+  pass: {properties: {minimalTlsVersion: "1.2"}}
+  fail: {properties: {minimalTlsVersion: "1.0"}}
+sql-auditing-off:
+  pass: {context: {sql: {*sql_id : {auditing: {properties: {state: Enabled, retentionDays: 90}}}}}}
+  fail: {context: {sql: {*sql_id : {auditing: {properties: {state: Disabled}}}}}}
+sql-audit-retention-short:
+  pass: {context: {sql: {*sql_id : {auditing: {properties: {state: Enabled, retentionDays: 0}}}}}}
+  fail: {context: {sql: {*sql_id : {auditing: {properties: {state: Enabled, retentionDays: 30}}}}}}
+sql-no-private-endpoint:
+  pass: {tags: {env: prod}, properties: {privateEndpointConnections: [{properties: {}}]}}
+  fail: {tags: {env: prod}, properties: {}}
+sqldb-no-zone-redundancy:
+  pass: {tags: {env: prod}, kind: "v12.0,user", sku: {tier: BusinessCritical}, properties: {zoneRedundant: true}}
+  fail: {tags: {env: prod}, kind: "v12.0,user", sku: {tier: GeneralPurpose}, properties: {zoneRedundant: false}}
+sqldb-backup-local-only:
+  pass: {tags: {env: prod}, kind: "v12.0,user", properties: {requestedBackupStorageRedundancy: Geo}}
+  fail: {tags: {env: prod}, kind: "v12.0,user", properties: {requestedBackupStorageRedundancy: Local}}
+pg-public-access:
+  pass: {properties: {network: {publicNetworkAccess: Disabled}}}
+  fail: {properties: {network: {publicNetworkAccess: Enabled}}}
+pg-no-entra-auth:
+  pass: {properties: {authConfig: {activeDirectoryAuth: Enabled}}}
+  fail: {properties: {authConfig: {activeDirectoryAuth: Disabled, passwordAuth: Enabled}}}
+pg-no-ha-production:
+  pass: {tags: {env: prod}, properties: {highAvailability: {mode: ZoneRedundant}}}
+  fail: {tags: {env: prod}, properties: {highAvailability: {mode: Disabled}}}
+pg-geo-backup-off:
+  pass: {tags: {env: prod}, properties: {backup: {geoRedundantBackup: Enabled}}}
+  fail: {tags: {env: prod}, properties: {backup: {geoRedundantBackup: Disabled}}}
+pg-short-backup-retention:
+  pass: {properties: {backup: {backupRetentionDays: 35}}}
+  fail: {properties: {backup: {backupRetentionDays: 7}}}
+pg-unsupported-version:
+  pass: {properties: {version: "16"}}
+  fail: {properties: {version: "12"}}
+mysql-public-access:
+  pass: {properties: {network: {publicNetworkAccess: Disabled}}}
+  fail: {properties: {network: {publicNetworkAccess: Enabled}}}
+mysql-no-ha-production:
+  pass: {tags: {env: prod}, properties: {highAvailability: {mode: ZoneRedundant}}}
+  fail: {tags: {env: prod}, properties: {highAvailability: {mode: Disabled}}}
+cosmos-public-network:
+  pass: [{properties: {publicNetworkAccess: Disabled}}, {properties: {publicNetworkAccess: Enabled, ipRules: [{ipAddressOrRange: 203.0.113.4}]}}]
+  fail: {properties: {publicNetworkAccess: Enabled, ipRules: [], isVirtualNetworkFilterEnabled: false}}
+cosmos-local-auth:
+  pass: {properties: {disableLocalAuth: true}}
+  fail: {properties: {disableLocalAuth: false}}
+cosmos-single-region-production:
+  pass: {tags: {env: prod}, properties: {enableAutomaticFailover: true, locations: [{locationName: East US}, {locationName: West US}]}}
+  fail: {tags: {env: prod}, properties: {enableAutomaticFailover: false, locations: [{locationName: East US}]}}
+cosmos-periodic-backup:
+  pass: {tags: {env: prod}, properties: {backupPolicy: {type: Continuous}}}
+  fail: {tags: {env: prod}, properties: {backupPolicy: {type: Periodic}}}
+redis-non-ssl-port:
+  pass: {properties: {enableNonSslPort: false}}
+  fail: {properties: {enableNonSslPort: true}}
+redis-min-tls:
+  pass: {properties: {minimumTlsVersion: "1.2"}}
+  fail: {properties: {minimumTlsVersion: "1.0"}}
+redis-public-network:
+  pass: {properties: {publicNetworkAccess: Disabled}}
+  fail: {properties: {publicNetworkAccess: Enabled}}
+redis-basic-production:
+  pass: {tags: {env: prod}, properties: {sku: {name: Premium}}}
+  fail: {tags: {env: prod}, properties: {sku: {name: Basic}}}
+redis-old-version:
+  pass: {properties: {redisVersion: "6.0"}}
+  fail: {properties: {redisVersion: "4.0.14"}}

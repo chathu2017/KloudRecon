@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Secrets & env (never commit)
+.env
+.env.*
+!.env.example
+backend/.local-secrets/
+
+# Node
+node_modules/
+apps/web/dist/
+apps/web/coverage/
+*.tsbuildinfo
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Playwright E2E output
+apps/web/e2e/.results/
+apps/web/e2e/.report/
+
+# Screenshot captures (regenerate with the e2e/capture specs)
+docs/ui/audit/
+docs/ui/before/
+docs/ui/after*/
+docs/ui/reference/
+docs/ui/directions/

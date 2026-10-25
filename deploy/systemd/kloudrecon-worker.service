@@ -1,0 +1,34 @@
+# KloudRecon worker: job queue, scheduler (advisory-locked), heartbeat. SIGTERM = graceful stop.
+[Unit]
+Description=KloudRecon worker
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=kloudrecon
+Group=kloudrecon
+WorkingDirectory=/opt/kloudrecon/current/backend
+EnvironmentFile=/etc/kloudrecon/kloudrecon.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/kloudrecon/ms-playwright
+ExecStart=/opt/kloudrecon/current/backend/.venv/bin/python -m kloudrecon.worker.main
+KillSignal=SIGTERM
+TimeoutStopSec=60
+Restart=always
+RestartSec=5
+
+# Hardening (Chromium for PDF reports needs no extra privileges in headless mode)
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

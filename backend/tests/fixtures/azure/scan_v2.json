@@ -1,0 +1,2662 @@
+[
+  {
+    "method": "POST",
+    "url": "login\\.microsoftonline\\.com/[^/]+/oauth2/v2\\.0/token",
+    "json": {
+      "access_token": {
+        "roles": []
+      },
+      "expires_in": 3599,
+      "token_type": "Bearer"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "management\\.azure\\.com/subscriptions\\?",
+    "json": {
+      "value": [
+        {
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "displayName": "Contoso Test Prod",
+          "state": "Enabled",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "managementGroups\\?",
+    "status": 403,
+    "json": {
+      "error": {
+        "code": "AuthorizationFailed",
+        "message": "No access."
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "resources | project",
+    "json": {
+      "totalRecords": 5,
+      "count": 2,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app",
+          "name": "vnet-app",
+          "type": "microsoft.network/virtualnetworks",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod",
+            "owner": "network-team"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "addressSpace": {
+              "addressPrefixes": [
+                "10.0.0.0/16"
+              ]
+            },
+            "subnets": [
+              {
+                "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/default",
+                "name": "default",
+                "properties": {
+                  "addressPrefix": "10.0.0.0/24"
+                }
+              }
+            ],
+            "virtualNetworkPeerings": []
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01",
+          "name": "nic-vm-app01",
+          "type": "microsoft.network/networkinterfaces",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "ipConfigurations": [
+              {
+                "name": "ipconfig1",
+                "properties": {
+                  "subnet": {
+                    "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/virtualNetworks/vnet-app/subnets/default"
+                  },
+                  "privateIPAddress": "10.0.0.4",
+                  "publicIPAddress": {
+                    "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/publicIPAddresses/pip-vm-app01"
+                  }
+                }
+              }
+            ],
+            "virtualMachine": {
+              "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+            }
+          }
+        }
+      ],
+      "$skipToken": "page2"
+    },
+    "times": 1
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "resources | project",
+    "json": {
+      "totalRecords": 5,
+      "count": 3,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "name": "vm-app01",
+          "type": "microsoft.compute/virtualmachines",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": null,
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "hardwareProfile": {
+              "vmSize": "Standard_D4s_v5"
+            },
+            "storageProfile": {
+              "osDisk": {
+                "name": "osdisk-vm-app01",
+                "managedDisk": {
+                  "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01"
+                }
+              },
+              "dataDisks": []
+            },
+            "networkProfile": {
+              "networkInterfaces": [
+                {
+                  "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01"
+                }
+              ]
+            },
+            "extended": {
+              "instanceView": {
+                "powerState": {
+                  "code": "PowerState/deallocated"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+          "name": "osdisk-vm-app01",
+          "type": "microsoft.compute/disks",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": {
+            "name": "Premium_LRS"
+          },
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "diskSizeGB": 64,
+            "diskState": "Attached"
+          }
+        },
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/publicIPAddresses/pip-vm-app01",
+          "name": "pip-vm-app01",
+          "type": "microsoft.network/publicipaddresses",
+          "kind": "",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tenantId": "22222222-bbbb-4ccc-8ddd-000000000000",
+          "sku": {
+            "name": "Standard"
+          },
+          "tags": {
+            "env": "prod"
+          },
+          "identity": null,
+          "managedBy": "",
+          "zones": null,
+          "plan": null,
+          "properties": {
+            "provisioningState": "Succeeded",
+            "ipAddress": "203.0.113.7",
+            "ipConfiguration": {
+              "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01/ipConfigurations/ipconfig1"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "resourcecontainers",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app",
+          "name": "rg-app",
+          "type": "microsoft.resources/subscriptions/resourcegroups",
+          "location": "eastus",
+          "resourceGroup": "rg-app",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "tags": {},
+          "properties": {}
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "roledefinitions",
+    "json": {
+      "totalRecords": 0,
+      "count": 0,
+      "data": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "roleassignments",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleAssignments/aaaa0000-0000-4000-8000-000000000001",
+          "name": "aaaa0000-0000-4000-8000-000000000001",
+          "subscriptionId": "11111111-aaaa-4bbb-8ccc-000000000001",
+          "properties": {
+            "principalId": "bbbb0000-0000-4000-8000-000000000001",
+            "principalType": "User",
+            "roleDefinitionId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "eventtypes/management/values",
+    "json": {
+      "value": [
+        {
+          "authorization": {
+            "action": "Microsoft.Compute/virtualMachines/write",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+          },
+          "caller": "dana@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-1",
+          "eventDataId": "evt-1",
+          "eventTimestamp": "2026-09-10T09:00:00Z",
+          "operationName": {
+            "value": "Microsoft.Compute/virtualMachines/write",
+            "localizedValue": "Microsoft.Compute/virtualMachines/write"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "resourceProviderName": {
+            "value": "Microsoft.Compute"
+          },
+          "resourceType": {
+            "value": "Microsoft.Compute/virtualMachines"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Compute/virtualMachines/read",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+          },
+          "caller": "dana@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-2",
+          "eventDataId": "evt-2",
+          "eventTimestamp": "2026-09-10T09:01:00Z",
+          "operationName": {
+            "value": "Microsoft.Compute/virtualMachines/read",
+            "localizedValue": "Microsoft.Compute/virtualMachines/read"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "resourceProviderName": {
+            "value": "Microsoft.Compute"
+          },
+          "resourceType": {
+            "value": "Microsoft.Compute/virtualMachines"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Network/networkInterfaces/write",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01"
+          },
+          "caller": "33333333-cccc-4ddd-8eee-000000000000",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-3",
+          "eventDataId": "evt-3",
+          "eventTimestamp": "2026-09-10T08:59:00Z",
+          "operationName": {
+            "value": "Microsoft.Network/networkInterfaces/write",
+            "localizedValue": "Microsoft.Network/networkInterfaces/write"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkInterfaces/nic-vm-app01",
+          "resourceProviderName": {
+            "value": "Microsoft.Network"
+          },
+          "resourceType": {
+            "value": "Microsoft.Network/networkInterfaces"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Compute/virtualMachines/write",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01"
+          },
+          "caller": "lee@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-10",
+          "eventDataId": "evt-10",
+          "eventTimestamp": "2026-09-20T10:00:00Z",
+          "operationName": {
+            "value": "Microsoft.Compute/virtualMachines/write",
+            "localizedValue": "Microsoft.Compute/virtualMachines/write"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+          "resourceProviderName": {
+            "value": "Microsoft.Compute"
+          },
+          "resourceType": {
+            "value": "Microsoft.Compute/virtualMachines"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Network/publicIPAddresses/write",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/publicIPAddresses/pip-vm-app01"
+          },
+          "caller": "lee@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-11",
+          "eventDataId": "evt-11",
+          "eventTimestamp": "2026-09-20T10:05:00Z",
+          "operationName": {
+            "value": "Microsoft.Network/publicIPAddresses/write",
+            "localizedValue": "Microsoft.Network/publicIPAddresses/write"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/publicIPAddresses/pip-vm-app01",
+          "resourceProviderName": {
+            "value": "Microsoft.Network"
+          },
+          "resourceType": {
+            "value": "Microsoft.Network/publicIPAddresses"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Network/networkSecurityGroups/delete",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkSecurityGroups/nsg-app"
+          },
+          "caller": "sam@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-12",
+          "eventDataId": "evt-12",
+          "eventTimestamp": "2026-09-20T11:00:00Z",
+          "operationName": {
+            "value": "Microsoft.Network/networkSecurityGroups/delete",
+            "localizedValue": "Microsoft.Network/networkSecurityGroups/delete"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Network/networkSecurityGroups/nsg-app",
+          "resourceProviderName": {
+            "value": "Microsoft.Network"
+          },
+          "resourceType": {
+            "value": "Microsoft.Network/networkSecurityGroups"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        },
+        {
+          "authorization": {
+            "action": "Microsoft.Authorization/roleAssignments/write",
+            "scope": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleAssignments/cccc"
+          },
+          "caller": "alex@contoso.example",
+          "category": {
+            "value": "Administrative"
+          },
+          "correlationId": "corr-13",
+          "eventDataId": "evt-13",
+          "eventTimestamp": "2026-09-20T12:00:00Z",
+          "operationName": {
+            "value": "Microsoft.Authorization/roleAssignments/write",
+            "localizedValue": "Microsoft.Authorization/roleAssignments/write"
+          },
+          "resourceGroupName": "rg-app",
+          "resourceId": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/providers/Microsoft.Authorization/roleAssignments/cccc",
+          "resourceProviderName": {
+            "value": "Microsoft.Authorization"
+          },
+          "resourceType": {
+            "value": "Microsoft.Authorization/roleAssignments"
+          },
+          "status": {
+            "value": "Succeeded"
+          },
+          "subStatus": {
+            "value": ""
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/pricings\\?",
+    "json": {
+      "value": [
+        {
+          "name": "VirtualMachines",
+          "properties": {
+            "pricingTier": "Standard",
+            "subPlan": "P2"
+          }
+        },
+        {
+          "name": "StorageAccounts",
+          "properties": {
+            "pricingTier": "Free"
+          }
+        },
+        {
+          "name": "Arm",
+          "properties": {
+            "pricingTier": "Standard"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/secureScores/ascScore",
+    "json": {
+      "properties": {
+        "score": {
+          "current": 30.5,
+          "max": 58,
+          "percentage": 0.5259
+        }
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Security/(securityContacts|assessments|subAssessments|alerts)\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Advisor/recommendations\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "policyStates/latest/summarize",
+    "json": {
+      "value": [
+        {
+          "results": {
+            "nonCompliantResources": 0,
+            "nonCompliantPolicies": 0
+          },
+          "policyAssignments": []
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Insights/diagnosticSettings\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Authorization/locks\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Consumption/budgets\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Compute/locations/[^/]+/usages\\?",
+    "json": {
+      "value": [
+        {
+          "name": {
+            "value": "cores",
+            "localizedValue": "Total Regional vCPUs"
+          },
+          "currentValue": 4,
+          "limit": 10,
+          "unit": "Count"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "(firewallRules|/keys|/secrets)\\?",
+    "json": {
+      "value": []
+    }
+  },
+  {
+    "method": "GET",
+    "url": "auditingSettings/default",
+    "json": {
+      "properties": {
+        "state": "Disabled"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "recoveryservicesresources",
+    "json": {
+      "totalRecords": 0,
+      "count": 0,
+      "data": []
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "patchassessmentresults') | project",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01/patchAssessmentResults/latest",
+          "type": "microsoft.compute/virtualmachines/patchassessmentresults",
+          "properties": {
+            "status": "Succeeded",
+            "osType": "Linux",
+            "rebootPending": false,
+            "lastModifiedDateTime": "2026-09-25T06:00:00Z",
+            "availablePatchCountByClassification": {
+              "security": 3,
+              "other": 7
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "ResourceGraph",
+    "body": "softwarepatches') | project",
+    "json": {
+      "totalRecords": 1,
+      "count": 1,
+      "data": [
+        {
+          "id": "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01/patchAssessmentResults/latest/softwarePatches/openssl",
+          "type": "microsoft.compute/virtualmachines/patchassessmentresults/softwarepatches",
+          "properties": {
+            "patchName": "openssl",
+            "version": "3.0.13-0ubuntu3.6",
+            "classifications": [
+              "Security"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "Microsoft\\.CostManagement/query",
+    "json": {
+      "properties": {
+        "columns": [
+          {
+            "name": "Cost",
+            "type": "Number"
+          },
+          {
+            "name": "UsageDate",
+            "type": "Number"
+          },
+          {
+            "name": "ResourceId",
+            "type": "String"
+          },
+          {
+            "name": "MeterCategory",
+            "type": "String"
+          },
+          {
+            "name": "Currency",
+            "type": "String"
+          }
+        ],
+        "rows": [
+          [
+            4.9,
+            20260921,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260921,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260920,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260920,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260919,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260919,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260918,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260918,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260917,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260917,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260916,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260916,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260915,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260915,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260914,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260914,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260913,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260913,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260912,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260912,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260911,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260911,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260910,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260910,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260909,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260909,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260908,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260908,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260907,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260907,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260906,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260906,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260905,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260905,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260904,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260904,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260903,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260903,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260902,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260902,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260901,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260901,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260831,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260831,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260830,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260830,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260829,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260829,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260828,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260828,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260827,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260827,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260826,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260826,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260825,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260825,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260824,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260824,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260823,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260823,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260822,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260822,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260821,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260821,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260820,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260820,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260819,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260819,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260818,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260818,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260817,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260817,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260816,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260816,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260815,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260815,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260814,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260814,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260813,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260813,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260812,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260812,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260811,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260811,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.9,
+            20260810,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260810,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260809,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260809,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ],
+          [
+            4.2,
+            20260808,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/virtualMachines/vm-app01",
+            "Virtual Machines",
+            "USD"
+          ],
+          [
+            0.66,
+            20260808,
+            "/subscriptions/11111111-aaaa-4bbb-8ccc-000000000001/resourceGroups/rg-app/providers/Microsoft.Compute/disks/osdisk-vm-app01",
+            "Storage",
+            "USD"
+          ]
+        ],
+        "nextLink": null
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "Microsoft\\.CostManagement/forecast",
+    "json": {
+      "properties": {
+        "columns": [
+          {
+            "name": "Cost",
+            "type": "Number"
+          },
+          {
+            "name": "UsageDate",
+            "type": "Number"
+          },
+          {
+            "name": "CostStatus",
+            "type": "String"
+          },
+          {
+            "name": "Currency",
+            "type": "String"
+          }
+        ],
+        "rows": [
+          [
+            5.2,
+            20260921,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260922,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260923,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260924,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260925,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260926,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260927,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260928,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260929,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20260930,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261001,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261002,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261003,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261004,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261005,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261006,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261007,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261008,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261009,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261010,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261011,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261012,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261013,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261014,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261015,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261016,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261017,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261018,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261019,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261020,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261021,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261022,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261023,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261024,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261025,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261026,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261027,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261028,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261029,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261030,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261031,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261101,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261102,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261103,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261104,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261105,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261106,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261107,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261108,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261109,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261110,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261111,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261112,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261113,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261114,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261115,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261116,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261117,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261118,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261119,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261120,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261121,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261122,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261123,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261124,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261125,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261126,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261127,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261128,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261129,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261130,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261201,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261202,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261203,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261204,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261205,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261206,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261207,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261208,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261209,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261210,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261211,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261212,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261213,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261214,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261215,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261216,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261217,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261218,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261219,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261220,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261221,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261222,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261223,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261224,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261225,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261226,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261227,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261228,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261229,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261230,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20261231,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270101,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270102,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270103,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270104,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270105,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270106,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270107,
+            "Forecast",
+            "USD"
+          ],
+          [
+            5.2,
+            20270108,
+            "Forecast",
+            "USD"
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Insights/metrics\\?",
+    "json": {
+      "value": [
+        {
+          "name": {
+            "value": "Percentage CPU"
+          },
+          "unit": "Percent",
+          "timeseries": [
+            {
+              "data": [
+                {
+                  "timeStamp": "2026-09-01T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T00:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T06:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T12:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T18:00:00Z",
+                  "average": 20,
+                  "maximum": 35
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": {
+            "value": "Available Memory Bytes"
+          },
+          "unit": "Bytes",
+          "timeseries": [
+            {
+              "data": [
+                {
+                  "timeStamp": "2026-09-01T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-01T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-02T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-03T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-04T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-05T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-06T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-07T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-08T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-09T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-10T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-11T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-12T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-13T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T00:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T06:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T12:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                },
+                {
+                  "timeStamp": "2026-09-14T18:00:00Z",
+                  "average": 4294967296,
+                  "maximum": 35
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "interval": "PT1H"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Network/locations/[^/]+/usages\\?",
+    "json": {
+      "value": [
+        {
+          "name": {
+            "value": "VirtualNetworks",
+            "localizedValue": "Virtual Networks"
+          },
+          "currentValue": 1,
+          "limit": 1000,
+          "unit": "Count"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "url": "Microsoft\\.Capacity/reservationOrders\\?",
+    "json": {
+      "value": []
+    }
+  }
+]

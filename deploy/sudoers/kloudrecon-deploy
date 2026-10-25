@@ -1,0 +1,3 @@
+# /etc/sudoers.d/kloudrecon-deploy (mode 0440, owner root). Validate with: sudo visudo -c
+# The GitHub self-hosted runner may run ONLY the root-owned activation script, without a password.
+ghrunner ALL=(root) NOPASSWD: /usr/local/bin/kloudrecon-activate

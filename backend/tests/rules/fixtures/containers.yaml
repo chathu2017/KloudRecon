@@ -1,0 +1,51 @@
+aks-public-api:
+  pass: [{properties: {apiServerAccessProfile: {enablePrivateCluster: true}}}, {properties: {apiServerAccessProfile: {enablePrivateCluster: false, authorizedIPRanges: [203.0.113.0/24]}}}]
+  fail: {properties: {apiServerAccessProfile: {enablePrivateCluster: false, authorizedIPRanges: []}}}
+aks-local-accounts:
+  pass: {properties: {disableLocalAccounts: true}}
+  fail: {properties: {disableLocalAccounts: false}}
+aks-no-entra-integration:
+  pass: {properties: {aadProfile: {managed: true, enableAzureRBAC: true}}}
+  fail: {properties: {aadProfile: null}}
+aks-no-azure-rbac:
+  pass: {properties: {aadProfile: {managed: true, enableAzureRBAC: true}}}
+  fail: {properties: {aadProfile: {managed: true, enableAzureRBAC: false}}}
+aks-rbac-disabled:
+  pass: {properties: {enableRBAC: true}}
+  fail: {properties: {enableRBAC: false}}
+aks-no-network-policy:
+  pass: {properties: {networkProfile: {networkPlugin: azure, networkPolicy: calico}}}
+  fail: {properties: {networkProfile: {networkPlugin: kubenet, networkPolicy: null}}}
+aks-unsupported-version:
+  pass: {properties: {kubernetesVersion: "1.32.4"}}
+  fail: {properties: {kubernetesVersion: "1.27.9"}}
+aks-no-azure-policy:
+  pass: {properties: {addonProfiles: {azurepolicy: {enabled: true}}}}
+  fail: {properties: {addonProfiles: {azurepolicy: {enabled: false}}}}
+aks-no-monitoring:
+  pass: {properties: {addonProfiles: {omsagent: {enabled: true}}}}
+  fail: {properties: {addonProfiles: {omsagent: {enabled: false}}}}
+aks-free-tier-production:
+  pass: {tags: {env: prod}, sku: {name: Base, tier: Standard}}
+  fail: {tags: {env: prod}, sku: {name: Base, tier: Free}}
+aks-pool-no-zones-production:
+  pass: {tags: {env: prod}, properties: {agentPoolProfiles: [{name: system, availabilityZones: ["1", "2", "3"]}]}}
+  fail: {tags: {env: prod}, properties: {agentPoolProfiles: [{name: system, availabilityZones: ["1", "2", "3"]}, {name: batch}]}}
+aks-pool-no-autoscale-production:
+  pass: {tags: {env: prod}, properties: {agentPoolProfiles: [{name: system, enableAutoScaling: true}]}}
+  fail: {tags: {env: prod}, properties: {agentPoolProfiles: [{name: system, enableAutoScaling: true}, {name: batch, enableAutoScaling: false}]}}
+aks-kubenet:
+  pass: {properties: {networkProfile: {networkPlugin: azure}}}
+  fail: {properties: {networkProfile: {networkPlugin: kubenet}}}
+acr-admin-user:
+  pass: {properties: {adminUserEnabled: false}}
+  fail: {properties: {adminUserEnabled: true}}
+acr-public-network:
+  pass: [{properties: {publicNetworkAccess: Disabled}}, {properties: {publicNetworkAccess: Enabled, networkRuleSet: {defaultAction: Deny}}}]
+  fail: {properties: {publicNetworkAccess: Enabled, networkRuleSet: {defaultAction: Allow}}}
+acr-anonymous-pull:
+  pass: {properties: {anonymousPullEnabled: false}}
+  fail: {properties: {anonymousPullEnabled: true}}
+acr-no-zone-redundancy:
+  pass: {tags: {env: prod}, properties: {zoneRedundancy: Enabled}}
+  fail: {tags: {env: prod}, properties: {zoneRedundancy: Disabled}}

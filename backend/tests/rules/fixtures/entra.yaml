@@ -1,0 +1,151 @@
+# Fixtures for Entra ID rules. `entra` is the normalized Graph snapshot (security/entra.py).
+x-ga: &ga 62e90394-69f5-4237-9190-012177145e10
+x-users-ok: &users_ok
+  - {id: u1, displayName: Alice, userPrincipalName: alice@contoso.example, userType: Member, accountEnabled: true, lastSignIn: "2026-08-30T00:00:00Z", mfaRegistered: true, onPremisesSyncEnabled: false}
+  - {id: u2, displayName: Bob, userPrincipalName: bob@contoso.example, userType: Member, accountEnabled: true, lastSignIn: "2026-08-29T00:00:00Z", mfaRegistered: true, onPremisesSyncEnabled: false}
+x-ca-good: &ca_good
+  - {id: c1, displayName: MFA all, state: enabled, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [all], grantControls: [mfa]}
+  - {id: c2, displayName: Block legacy, state: enabled, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [exchangeActiveSync, other], grantControls: [block]}
+x-roles-ok: &roles_ok
+  - {principalId: u1, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+  - {principalId: u2, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+x-entra-ok: &entra_ok
+  users: *users_ok
+  groups: []
+  servicePrincipals: [{id: sp1, appId: a1, displayName: crm-sync, type: Application}]
+  applications: []
+  directoryRoles: *roles_ok
+  conditionalAccess: *ca_good
+  securityDefaults: false
+  authorizationPolicy: {allowInvitesFrom: adminsAndGuestInviters, guestUserRoleId: 2af84b1e-32c8-42b7-82bc-daa82404023b, defaultUserRolePermissions: {allowedToCreateApps: false}}
+
+entra-no-baseline-mfa:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, conditionalAccess: []}}}
+
+entra-ca-admin-mfa-missing:
+  pass:
+    context: {entra: {<<: *entra_ok, conditionalAccess: [{id: c9, displayName: MFA admins, state: enabled, includeUsers: [], includeRoles: [*ga], excludeUsers: [], clientAppTypes: [all], grantControls: [mfa]}]}}
+  fail: {context: {entra: {<<: *entra_ok, conditionalAccess: []}}}
+
+entra-ca-all-users-mfa-missing:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context: {entra: {<<: *entra_ok, conditionalAccess: [{id: c1, displayName: MFA all, state: enabledForReportingButNotEnforced, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [all], grantControls: [mfa]}]}}
+
+entra-legacy-auth-not-blocked:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, conditionalAccess: [{id: c1, displayName: MFA all, state: enabled, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [all], grantControls: [mfa]}]}}}
+
+entra-ca-report-only:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, conditionalAccess: [{id: c3, displayName: Trial, state: enabledForReportingButNotEnforced, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [all], grantControls: [mfa]}]}}}
+
+entra-ca-disabled:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, conditionalAccess: [{id: c3, displayName: Devices, state: disabled, includeUsers: [All], includeRoles: [], excludeUsers: [], clientAppTypes: [all], grantControls: [compliantDevice]}]}}}
+
+entra-admin-without-mfa:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context:
+      entra:
+        <<: *entra_ok
+        users:
+          - {id: u1, displayName: Alice, userPrincipalName: alice@contoso.example, userType: Member, accountEnabled: true, lastSignIn: "2026-08-30T00:00:00Z", mfaRegistered: false}
+    expect: [alice@contoso.example]
+
+entra-mfa-coverage-low:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context:
+      entra:
+        <<: *entra_ok
+        users:
+          - {id: u1, userPrincipalName: a@x, userType: Member, accountEnabled: true, mfaRegistered: true}
+          - {id: u2, userPrincipalName: b@x, userType: Member, accountEnabled: true, mfaRegistered: false}
+
+entra-global-admin-count:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    - context: {entra: {<<: *entra_ok, directoryRoles: [{principalId: u1, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}]}}
+    - context:
+        entra:
+          <<: *entra_ok
+          directoryRoles:
+            - {principalId: a, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+            - {principalId: b, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+            - {principalId: c, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+            - {principalId: d, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+            - {principalId: e, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+            - {principalId: f, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}
+
+entra-guest-admin:
+  pass:
+    context: {entra: {<<: *entra_ok, users: [{id: g1, userPrincipalName: "g_x#EXT#@contoso.example", userType: Guest, accountEnabled: true}]}}
+  fail:
+    context:
+      entra:
+        <<: *entra_ok
+        users: [{id: g1, userPrincipalName: "g_x#EXT#@contoso.example", userType: Guest, accountEnabled: true}]
+        directoryRoles: [{principalId: g1, roleTemplateId: *ga, roleName: Global Administrator, privileged: true}]
+
+entra-sp-privileged-role:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context: {entra: {<<: *entra_ok, directoryRoles: [{principalId: sp1, roleTemplateId: 9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3, roleName: Application Administrator, privileged: true}]}}
+
+entra-synced-admin:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context:
+      entra:
+        <<: *entra_ok
+        users: [{id: u1, userPrincipalName: alice@contoso.example, userType: Member, accountEnabled: true, onPremisesSyncEnabled: true, mfaRegistered: true}]
+
+entra-stale-member:
+  pass: {context: {entra: *entra_ok}}
+  fail:
+    context: {entra: {<<: *entra_ok, users: [{id: u9, userPrincipalName: old@x, userType: Member, accountEnabled: true, lastSignIn: "2026-01-01T00:00:00Z"}]}}
+
+entra-stale-guest:
+  pass:
+    context: {entra: {<<: *entra_ok, users: [{id: g1, userPrincipalName: g@x, userType: Guest, accountEnabled: true, lastSignIn: "2026-08-20T00:00:00Z"}]}}
+  fail:
+    context: {entra: {<<: *entra_ok, users: [{id: g1, userPrincipalName: g@x, userType: Guest, accountEnabled: true, lastSignIn: "2025-12-01T00:00:00Z"}]}}
+
+entra-guest-invites-open:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, authorizationPolicy: {allowInvitesFrom: everyone}}}}
+
+entra-users-can-register-apps:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, authorizationPolicy: {defaultUserRolePermissions: {allowedToCreateApps: true}}}}}
+
+entra-guest-access-not-restricted:
+  pass: {context: {entra: *entra_ok}}
+  fail: {context: {entra: {<<: *entra_ok, authorizationPolicy: {guestUserRoleId: 10dae51f-b6af-4016-8d66-8c2a99b929b3}}}}
+
+entra-app-credential-expired:
+  pass:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2026-06-01T00:00:00Z", end: "2026-12-01T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+  fail:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2025-06-01T00:00:00Z", end: "2026-08-01T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+
+entra-app-credential-expiring:
+  pass:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2026-06-01T00:00:00Z", end: "2026-12-01T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+  fail:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2026-06-01T00:00:00Z", end: "2026-09-10T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+
+entra-app-credential-long-lived:
+  pass:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2026-06-01T00:00:00Z", end: "2026-12-01T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+  fail:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [{kind: password, start: "2026-06-01T00:00:00Z", end: "2028-06-01T00:00:00Z"}], graphAppPermissions: [], highPrivilege: []}]}}
+
+entra-app-high-graph-permissions:
+  pass:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [], graphAppPermissions: [x], highPrivilege: []}]}}
+  fail:
+    context: {entra: {<<: *entra_ok, applications: [{id: o1, appId: a1, displayName: crm, credentials: [], graphAppPermissions: [19dbc75e-c2e2-444c-a770-ec69d8559fc7], highPrivilege: [Directory.ReadWrite.All]}]}}

@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.svg text
+*.woff2 binary
+deploy/bin/* text eol=lf

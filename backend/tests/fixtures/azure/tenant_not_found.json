@@ -1,0 +1,17 @@
+[
+  {
+    "method": "POST",
+    "url": "login\\.microsoftonline\\.com/[^/]+/oauth2/v2\\.0/token",
+    "status": 400,
+    "json": {
+      "error": "unauthorized_client",
+      "error_description": "AADSTS90002: Tenant '44444444-dddd-4eee-8fff-000000000000' not found. Check to make sure you have the correct tenant ID and are signing into the correct cloud. Trace ID: 0f5c8d2e-0000-4000-8000-000000000001 Correlation ID: 5a1b2c3d-0000-4000-8000-000000000002 Timestamp: 2026-09-26 10:00:00Z",
+      "error_codes": [
+        90002
+      ],
+      "timestamp": "2026-09-26 10:00:00Z",
+      "trace_id": "0f5c8d2e-0000-4000-8000-000000000001",
+      "correlation_id": "5a1b2c3d-0000-4000-8000-000000000002"
+    }
+  }
+]

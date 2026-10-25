@@ -1,0 +1,73 @@
+x-running: &running {extended: {instanceView: {powerState: {code: PowerState/running}}}}
+
+cost-disk-unattached:
+  pass: {managedBy: /vm1, properties: {diskState: Attached}}
+  fail: {properties: {diskState: Unattached, diskSizeGB: 512}, sku: {name: Premium_LRS}}
+cost-public-ip-unattached:
+  pass: {properties: {ipConfiguration: {id: /nic/ipconfig1}}}
+  fail: {properties: {ipAddress: 203.0.113.9}, sku: {name: Standard}}
+cost-nic-orphaned:
+  pass: {properties: {virtualMachine: {id: /vm1}}}
+  fail: {properties: {ipConfigurations: []}}
+cost-vm-deallocated:
+  pass: {properties: *running}
+  fail: {properties: {extended: {instanceView: {powerState: {code: PowerState/deallocated}}}}}
+cost-vm-stopped-not-deallocated:
+  pass: {properties: *running}
+  fail: {properties: {extended: {instanceView: {powerState: {code: PowerState/stopped}}}}}
+cost-app-plan-empty:
+  pass: {sku: {name: P1v3, tier: PremiumV3, capacity: 1}, properties: {numberOfSites: 2}}
+  fail: {sku: {name: P1v3, tier: PremiumV3, capacity: 1}, properties: {numberOfSites: 0}}
+cost-snapshot-old:
+  pass: {properties: {timeCreated: "2026-08-15T00:00:00Z"}}
+  fail: {properties: {timeCreated: "2025-01-10T00:00:00Z", diskSizeGB: 256}}
+cost-snapshot-full:
+  pass: {properties: {incremental: true}}
+  fail: {properties: {incremental: false}}
+cost-lb-empty:
+  pass: {sku: {name: Standard}, properties: {loadBalancingRules: [{name: https}]}}
+  fail: {sku: {name: Standard}, properties: {loadBalancingRules: [], backendAddressPools: []}}
+cost-appgw-no-backends:
+  pass: {properties: {backendAddressPools: [{name: p, properties: {backendAddresses: [{fqdn: app.contoso.example}]}}]}}
+  fail: {properties: {backendAddressPools: [{name: p, properties: {backendAddresses: []}}]}}
+cost-vpn-gateway-unused:
+  pass:
+    resources:
+      - {type: microsoft.network/virtualnetworkgateways, name: gw1}
+      - {type: microsoft.network/connections, name: cn1, properties: {virtualNetworkGateway1: {id: /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.network/virtualnetworkgateways/gw1}}}
+  fail:
+    resources: [{type: microsoft.network/virtualnetworkgateways, name: gw1}]
+cost-premium-disk-nonprod:
+  pass: {tags: {env: dev}, sku: {name: StandardSSD_LRS}}
+  fail: {tags: {env: dev}, sku: {name: Premium_LRS}, properties: {diskSizeGB: 256}}
+cost-dev-vm-oversized:
+  pass: {tags: {env: dev}, properties: {hardwareProfile: {vmSize: Standard_D4s_v5}}}
+  fail: {tags: {env: test}, properties: {hardwareProfile: {vmSize: Standard_D16s_v5}}}
+cost-dev-vm-no-autoshutdown:
+  pass:
+    resources:
+      - {name: vm1, tags: {env: dev}, properties: *running}
+      - {type: microsoft.devtestlab/schedules, name: shutdown-computevm-vm1, properties: {status: Enabled, targetResourceId: /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.compute/virtualmachines/vm1}}
+  fail:
+    resources: [{name: vm1, tags: {env: dev}, properties: *running}]
+cost-geo-storage-nonprod:
+  pass: {tags: {env: dev}, sku: {name: Standard_LRS}}
+  fail: {tags: {env: dev}, sku: {name: Standard_RAGRS}}
+cost-sql-nonprod-premium:
+  pass: {tags: {env: dev}, sku: {name: GP_Gen5_2, tier: GeneralPurpose, capacity: 2}}
+  fail: {tags: {env: dev}, sku: {name: BC_Gen5_4, tier: BusinessCritical, capacity: 4}}
+cost-redis-nonprod-premium:
+  pass: {tags: {env: dev}, properties: {sku: {name: Standard}}}
+  fail: {tags: {env: dev}, properties: {sku: {name: Premium}}}
+cost-app-plan-nonprod-premium:
+  pass: {tags: {env: dev}, sku: {name: B2, tier: Basic}}
+  fail: {tags: {env: dev}, sku: {name: P1v3, tier: PremiumV3}}
+cost-aks-nonprod-fixed-pools:
+  pass: {tags: {env: dev}, properties: {agentPoolProfiles: [{name: np1, count: 2, vmSize: Standard_D4s_v5, enableAutoScaling: true}]}}
+  fail: {tags: {env: dev}, properties: {agentPoolProfiles: [{name: np1, count: 4, vmSize: Standard_D4s_v5, enableAutoScaling: false}]}}
+cost-vm-previous-generation:
+  pass: {properties: {hardwareProfile: {vmSize: Standard_D4s_v5}}}
+  fail: {properties: {hardwareProfile: {vmSize: Standard_D4s_v3}}}
+cost-windows-no-hybrid-benefit:
+  pass: {properties: {licenseType: Windows_Server, storageProfile: {osDisk: {osType: Windows}}}}
+  fail: {properties: {storageProfile: {osDisk: {osType: Windows}}}}

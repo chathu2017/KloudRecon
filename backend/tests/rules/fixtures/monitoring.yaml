@@ -1,0 +1,83 @@
+x-sub: &sub "00000000-0000-4000-8000-000000000001"
+x-kv: &kv /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.keyvault/vaults/res1
+
+def-servers-off:
+  pass: {resources: [{type: microsoft.compute/virtualmachines, name: vm1}], context: {defender_plans: {*sub : {VirtualMachines: Standard}}}}
+  fail: {resources: [{type: microsoft.compute/virtualmachines, name: vm1}], context: {defender_plans: {*sub : {VirtualMachines: Free}}}}
+def-appservice-off:
+  pass: {resources: [{type: microsoft.web/sites}], context: {defender_plans: {*sub : {AppServices: Standard}}}}
+  fail: {resources: [{type: microsoft.web/sites}], context: {defender_plans: {*sub : {AppServices: Free}}}}
+def-sql-off:
+  pass: {resources: [{type: microsoft.sql/servers}], context: {defender_plans: {*sub : {SqlServers: Standard}}}}
+  fail: {resources: [{type: microsoft.sql/servers}], context: {defender_plans: {*sub : {}}}}
+def-storage-off:
+  pass: {resources: [{type: microsoft.storage/storageaccounts}], context: {defender_plans: {*sub : {StorageAccounts: Standard}}}}
+  fail: {resources: [{type: microsoft.storage/storageaccounts}], context: {defender_plans: {*sub : {StorageAccounts: Free}}}}
+def-containers-off:
+  pass: {resources: [{type: microsoft.containerservice/managedclusters}], context: {defender_plans: {*sub : {Containers: Standard}}}}
+  fail: {resources: [{type: microsoft.containerregistry/registries}], context: {defender_plans: {*sub : {Containers: Free}}}}
+def-keyvault-off:
+  pass: {resources: [{type: microsoft.keyvault/vaults}], context: {defender_plans: {*sub : {KeyVaults: Standard}}}}
+  fail: {resources: [{type: microsoft.keyvault/vaults}], context: {defender_plans: {*sub : {KeyVaults: Free}}}}
+def-oss-db-off:
+  pass: {resources: [{type: microsoft.dbforpostgresql/flexibleservers}], context: {defender_plans: {*sub : {OpenSourceRelationalDatabases: Standard}}}}
+  fail: {resources: [{type: microsoft.dbforpostgresql/flexibleservers}], context: {defender_plans: {*sub : {OpenSourceRelationalDatabases: Free}}}}
+def-cosmos-off:
+  pass: {resources: [{type: microsoft.documentdb/databaseaccounts}], context: {defender_plans: {*sub : {CosmosDbs: Standard}}}}
+  fail: {resources: [{type: microsoft.documentdb/databaseaccounts}], context: {defender_plans: {*sub : {CosmosDbs: Free}}}}
+def-arm-off:
+  pass: {context: {defender_plans: {*sub : {Arm: Standard}}}}
+  fail: {context: {defender_plans: {*sub : {Arm: Free}}}}
+def-cspm-off:
+  pass: {context: {defender_plans: {*sub : {CloudPosture: Standard}}}}
+  fail: {context: {defender_plans: {*sub : {CloudPosture: Free}}}}
+def-no-security-contact:
+  pass: {context: {security_contacts: {*sub : [{name: default, properties: {emails: secops@contoso.example}}]}}}
+  fail: {context: {security_contacts: {*sub : []}}}
+mon-activity-log-not-exported:
+  pass: {context: {activity_export: {*sub : true}}}
+  fail: {context: {activity_export: {*sub : false}}}
+mon-keyvault-no-logs:
+  pass: {context: {diagnostics_types: [microsoft.keyvault/vaults], diagnostics: {*kv : [{name: to-law, properties: {workspaceId: /law}}]}}}
+  fail: {context: {diagnostics_types: [microsoft.keyvault/vaults], diagnostics: {}}}
+mon-network-device-no-logs:
+  pass:
+    resources: [{type: microsoft.network/azurefirewalls, name: afw}]
+    context: {diagnostics_types: [microsoft.network/azurefirewalls], diagnostics: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.network/azurefirewalls/afw": [{name: d}]}}
+  fail:
+    resources: [{type: microsoft.network/azurefirewalls, name: afw}]
+    context: {diagnostics_types: [microsoft.network/azurefirewalls], diagnostics: {}}
+mon-data-service-no-logs:
+  pass:
+    resources: [{type: microsoft.cache/redis, name: redis1}]
+    context: {diagnostics_types: [microsoft.cache/redis], diagnostics: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.cache/redis/redis1": [{name: d}]}}
+  fail:
+    resources: [{type: microsoft.cache/redis, name: redis1}]
+    context: {diagnostics_types: [microsoft.cache/redis], diagnostics: {}}
+mon-webapp-no-logs:
+  pass:
+    resources: [{type: microsoft.web/sites, name: app1}]
+    context: {diagnostics_types: [microsoft.web/sites], diagnostics: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.web/sites/app1": [{name: d}]}}
+  fail:
+    resources: [{type: microsoft.web/sites, name: app1}]
+    context: {diagnostics_types: [microsoft.web/sites], diagnostics: {}}
+mon-aks-no-audit-logs:
+  pass:
+    resources: [{name: aks1}]
+    context: {diagnostics_types: [microsoft.containerservice/managedclusters], diagnostics: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.containerservice/managedclusters/aks1": [{name: d, properties: {logs: [{category: kube-audit-admin, enabled: true}]}}]}}
+  fail:
+    resources: [{name: aks1}]
+    context: {diagnostics_types: [microsoft.containerservice/managedclusters], diagnostics: {"/subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.containerservice/managedclusters/aks1": [{name: d, properties: {logs: [{category: kube-apiserver, enabled: true}]}}]}}
+mon-no-flow-logs:
+  pass:
+    resources:
+      - {type: microsoft.network/virtualnetworks, name: vnet1}
+      - {type: microsoft.network/networkwatchers/flowlogs, name: fl1, properties: {targetResourceId: /subscriptions/00000000-0000-4000-8000-000000000001/resourcegroups/rg-test/providers/microsoft.network/virtualnetworks/vnet1, enabled: true}}
+  fail:
+    resources: [{type: microsoft.network/virtualnetworks, name: vnet1}]
+mon-law-short-retention:
+  pass: {properties: {retentionInDays: 90}}
+  fail: {properties: {retentionInDays: 30}}
+mon-appinsights-classic:
+  pass: {properties: {WorkspaceResourceId: /law}}
+  fail: {properties: {Application_Type: web}}

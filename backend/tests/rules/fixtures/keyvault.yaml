@@ -1,0 +1,36 @@
+kv-purge-protection:
+  pass: {properties: {enablePurgeProtection: true}}
+  fail: {properties: {enablePurgeProtection: null}}
+kv-soft-delete-off:
+  pass: {properties: {enableSoftDelete: true}}
+  fail: {properties: {enableSoftDelete: false}}
+kv-short-retention:
+  pass: {properties: {softDeleteRetentionInDays: 90}}
+  fail: {properties: {softDeleteRetentionInDays: 7}}
+kv-rbac-disabled:
+  pass: {properties: {enableRbacAuthorization: true}}
+  fail: {properties: {enableRbacAuthorization: false}}
+kv-public-network:
+  pass: [{properties: {publicNetworkAccess: Disabled}}, {properties: {publicNetworkAccess: Enabled, networkAcls: {defaultAction: Deny}}}]
+  fail: {properties: {publicNetworkAccess: Enabled, networkAcls: {defaultAction: Allow}}}
+kv-no-private-endpoint:
+  pass: {tags: {env: prod}, properties: {privateEndpointConnections: [{properties: {}}]}}
+  fail: {tags: {env: prod}, properties: {}}
+kv-access-policy-broad:
+  pass: {properties: {enableRbacAuthorization: false, accessPolicies: [{objectId: o1, permissions: {secrets: [get, list]}}]}}
+  fail: {properties: {enableRbacAuthorization: false, accessPolicies: [{objectId: o1, permissions: {secrets: [get, list]}}, {objectId: o2, permissions: {keys: [all]}}]}}
+kv-key-no-expiry:
+  pass: {properties: {attributes: {enabled: true, exp: 1830297600}}}
+  fail: {properties: {attributes: {enabled: true}}}
+kv-secret-no-expiry:
+  pass: {properties: {attributes: {enabled: true, exp: 1830297600}}}
+  fail: {properties: {attributes: {enabled: true}}}
+kv-key-expired:
+  pass: {properties: {attributes: {enabled: true, exp: 1830297600}}}
+  fail: {properties: {attributes: {enabled: true, exp: 1735689600}}}
+kv-key-no-rotation:
+  pass: {properties: {rotationPolicy: {lifetimeActions: [{action: {type: Rotate}, trigger: {timeBeforeExpiry: P30D}}]}}}
+  fail: {properties: {rotationPolicy: {lifetimeActions: [{action: {type: Notify}}]}}}
+kv-rsa-key-too-short:
+  pass: {properties: {kty: RSA, keySize: 3072}}
+  fail: {properties: {kty: RSA, keySize: 1024}}
